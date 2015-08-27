@@ -63,6 +63,17 @@ def normal_sand(block, data=0):
 		"Time": 1
 	}
 
+def ride(entities):
+	topmost = None
+	absoluteTopmost = None
+	
+	for entity in entities:
+		if topmost == None:
+			absoluteTopmost = entity
+		else:
+			topmost["Riding"] = entity
+		topmost = entity
+	return absoluteTopmost
 
 if __name__ == "__main__":
 	cprint("""----------------------------------------
@@ -121,20 +132,23 @@ if __name__ == "__main__":
 
 
 	final_command_obj = None
-	if len(clock_commands) or len(init_commands):
-		command_sands = [normal_sand("redstone_block")]
+	if clock_commands or init_commands:
+		command_sands = []
+
+		if init_commands: command_sands.append(normal_sand("redstone_block"))
+
 		for command in init_commands:
 			if command is init_commands[0]:
 				command_sands.append(generate_sand(command, 0, "command_block"))
 			else:
 				command_sands.append(generate_sand(command, 0))
 
-		if mode == 'i':
+		if mode == 'i' and clock_commands:
 			offset = len(clock_commands) + 1
 			command_sands.append(generate_sand(
 				Command(format("blockdata ~ ~-{offset} ~ {auto:1b}", offset = offset)), 0
 			))
-		offset = len(init_commands) + 1 + int(mode == 'i')
+		offset = len(init_commands) + 1 + int(mode == 'i' and clock_commands)
 		command_sands.append(generate_sand(
 			Command(format("fill ~ ~ ~ ~ ~{offset} ~ air", offset = offset)), 0
 		))
@@ -144,10 +158,7 @@ if __name__ == "__main__":
 				command_sands.append(generate_sand(command, 1, "repeating_command_block", mode == 'i'))
 			else:
 				command_sands.append(generate_sand(command, 1))
-
-
-
-
+		final_command_obj = nbt.cmd("summon FallingSand ~ ~1 ~ ", ride(command_sands))
 
 	final_command = nbt.JSON2Command(final_command_obj)
 
