@@ -1,3 +1,4 @@
+import pyperclip
 endBraces = 0
 x = 1
 commands = []
@@ -60,7 +61,8 @@ if mi:
 					final += str(eachCommand)+"},Data:1,Time:1,Riding:{id:FallingSand,Block:chain_command_block,TileEntityData:{Command:"
 					endBraces += 1
 		if len(final) < 32500:
-			print "\nCommand: \n\n"+final
+			pyperclip.copy(final)
+			print "\nCommand (copied to clipboard): \n\n"+final
 			raw_input("\nWindows: Right click top screen bar, click Edit > Mark, select the command, hit enter.\nOSX: idk\n\nHit enter to close...")
 		else:
 			raise Exception("Too Large")
@@ -109,7 +111,8 @@ else:
 					endBraces += 1
 
 		if len(final) < 32500:
-			print "\nCommand: \n\n"+final
+			pyperclip.copy(final)
+			print "\nCommand (copied to clipboard): \n\n"+final
 			raw_input("\nWindows: Right click top screen bar, click Edit > Mark, select the command, hit enter.\nOSX: idk\n\nHit enter to close...")
 		else:
 			raise Exception("Too Large")
