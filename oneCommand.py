@@ -1,16 +1,37 @@
-import pyperclip
+from __future__ import print_function
+
+from util import *
 
 import argparse
 import sys
+
+cprintconf.name = "One Command"
+cprintconf.color = bcolors.PEACH
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-m", "--manual", help="Uses manual mode", dest="manual", action="store_true")
 parser.add_argument("-i", "--instant", help="Uses instant mode", dest="instant", action="store_false")
 parser.add_argument("-f", "--command_file", help="File to load commands from", dest="filepath", action="store",
 	default="")
+parser.add_argument("-C", "--no-copy", help="Don't copy the output command", dest="nocopy", action="store_true")
+parser.add_argument("-q", "--quiet", help="Silence output", dest="quiet", action="store_true")
+parser.add_argument("-v", "--verbose", help="Detailed output", dest="loud", action="store_true")
 args = parser.parse_args()
 
-print """
+if args.quiet:
+	def cprint(*args, **kwargs):
+		pass
+
+if args.nocopy:
+	class pyperclip:
+		@staticmethod
+		def copy(*args, **kwargs): pass
+		@staticmethod
+		def paste(*args, **kwargs): pass
+else:
+	import pyperclip
+
+cprint("""
 ----------------------------------------
 TheDestruc7i0n's 1.9 "One Command" Creator
 
@@ -20,7 +41,7 @@ TheDestruc7i0n's 1.9 "One Command" Creator
 (A known bug is when you have only one constant command and multiple "INIT:" commands. 
 Also, you cannot have only one "INIT:" command and no constant commands.)
 ----------------------------------------
-"""
+""")
 
 class Command:
 	def __init__(self, cmd, conditional):
@@ -33,7 +54,7 @@ endBraces = 0
 x = 1
 once = []
 if not args.manual and args.instant:
-	mi = raw_input("Manual (m) or Instant (i)? ")
+	mi = cinput("Manual (m) or Instant (i)? ")
 	if mi == "m":
 		mi = True
 	elif mi == "i":
@@ -45,11 +66,11 @@ else:
 
 cmdtext = []
 if not args.filepath:
-	inp = raw_input("Command "+str(x)+": ")
+	inp = cinput("Command "+str(x)+": ")
 	while inp != "":
 		x+=1
 		cmdtext.append(str(inp))
-		inp = raw_input("Command "+str(x)+": ")
+		inp = cinput("Command "+str(x)+": ")
 elif args.filepath == "stdin":
 	cmdtext = sys.stdin.read().split("\n")
 else:
@@ -81,12 +102,16 @@ for cmd in cmdtext[:]:
 		commands.append(Command(cmd, cond))
 
 if mi:
+	final = ""
 	if len(commands) > 0:
 		commands.reverse()
 		once.reverse()
-		final = ""
 		for eachCommand in commands:
 			conditional = "conditional:1b," if eachCommand.cond else ""
+			if args.loud:
+				cprint(eachCommand)
+				if eachCommand.cond:
+					cprint("  - Conditional")
 			if len(commands) == 1 and len(once) <= 0:
 				final = "setblock ~ ~1 ~ repeating_command_block 1 replace {"+ conditional +"Command:"+str(eachCommand)+"}"
 			else:
@@ -119,20 +144,24 @@ if mi:
 				else:
 					final += str(eachCommand)+"},Data:1,Time:1,Riding:{id:FallingSand,Block:chain_command_block,TileEntityData:{Command:"
 					endBraces += 1
-		if len(final) < 32500:
-			pyperclip.copy(final)
-			sys.stdout.write(final)
-			print "\nCommand (copied to clipboard): \n\n"+final
-		else:
-			raise Exception("Too Large")
+	if len(final) < 32500:
+		pyperclip.copy(final)
+		if not args.nocopy:
+			cprint("Command (copied to clipboard):")
+		sys.stdout.write(final)
 	else:
-		raise Exception("Error")
+		raise OverflowError("Command too large ("+str(len(final))+" > 32500)")
 else:
+	final = ""
 	if len(commands) > 0:
 		commands.reverse()
 		once.reverse()
 		for eachCommand in commands:
 			conditional = "conditional:1b," if eachCommand.cond else ""
+			if args.loud:
+				cprint("{cmd}{cond}", 
+					cmd=eachCommand,
+					cond = "\n  - Conditional" if eachCommand.cond else "")
 			if len(commands) == 1 and len(once) <= 0:
 				final = "setblock ~ ~1 ~ repeating_command_block 1 replace {"+ conditional +"Command:"+str(eachCommand)+",auto:1b}"
 			else:
@@ -153,14 +182,19 @@ else:
 					final += str(eachCommand)
 				elif eachCommand == commands[-1]:
 					if len(once) > 0:
-						final += "},Data:1,Time:1,Riding:{id:FallingSand,Block:chain_command_block,TileEntityData:{"+ conditional +"Command:"+str(eachCommand)+"},Data:1,Time:1,Riding:{id:FallingSand,Block:chain_command_block,TileEntityData:{Command:fill ~ ~ ~ ~ ~-"+str(len(once))+" ~ chain_command_block 1 replace},Data:1,Time:1,Riding:{id:FallingSand,Block:chain_command_block,TileEntityData:{Command:"
+						final += "},Data:1,Time:1,Riding:{id:FallingSand,Block:chain_command_block,TileEntityData:{"+ conditional +"Command:"+str(eachCommand)+"},Data:1,Time:1,Riding:{id:FallingSand,Block:chain_command_block,TileEntityData:{Command:fill ~ ~ ~ ~ ~-"+str(len(once))+" ~ chain_command_block 1 replace},Data:1,Time:1,Riding:{id:FallingSand,Block:chain_command_block,TileEntityData:{"
 						endBraces += 3
 						for eachOnce in once:
+							onecond = "conditional:1b," if oneCond.cond else ""
+							if args.loud:
+								cprint("{cmd}\n  - Initialization{cond}", 
+									cmd=eachOnce,
+									cond = "\n  - Conditional" if eachCommand.cond else "")
 							if eachOnce == once[-1]:
-								final += str(eachOnce)+"},Data:1,Time:1,Riding:{id:FallingSand,Block:repeating_command_block,TileEntityData:{Command:},Data:1,Time:1,Riding:{id:FallingSand,Block:stone,Time:1}"
+								final += onecond+"Command:" + str(eachOnce)+"},Data:1,Time:1,Riding:{id:FallingSand,Block:repeating_command_block,TileEntityData:{Command:},Data:1,Time:1,Riding:{id:FallingSand,Block:stone,Time:1}"
 								endBraces += 1
 							else:
-								final += str(eachOnce)+"},Data:1,Time:1,Riding:{id:FallingSand,Block:chain_command_block,TileEntityData:{Command:"
+								final += onecond+"Command:"+str(eachOnce)+"},Data:1,Time:1,Riding:{id:FallingSand,Block:chain_command_block,TileEntityData:{"
 								endBraces += 1
 					else:	
 						final += "},Data:1,Time:1,Riding:{id:FallingSand,Block:repeating_command_block,TileEntityData:{"+ conditional +"Command:"+str(eachCommand)+"},Data:1,Time:1,Riding:{id:FallingSand,Block:stone,Time:1}"
@@ -169,12 +203,10 @@ else:
 				else:
 					final += str(eachCommand)+"},Data:1,Time:1,Riding:{id:FallingSand,Block:chain_command_block,TileEntityData:{Command:"
 					endBraces += 1
-
-		if len(final) < 32500:
-			pyperclip.copy(final)
-			sys.stdout.write(final)
-			print "\nCommand (copied to clipboard): \n\n"+final
-		else:
-			raise Exception("Too Large")
+	if len(final) < 32500:
+		pyperclip.copy(final)
+		if not args.nocopy:
+			cprint("Command (copied to clipboard):")
+		sys.stdout.write(final)
 	else:
-		raise Exception("Error")
+		raise OverflowError("Command too large ("+str(len(final))+" > 32500)")
