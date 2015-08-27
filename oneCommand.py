@@ -117,6 +117,7 @@ if __name__ == "__main__":
 	# do all INIT and COND checking
 	for command in commands:
 		if not command: continue
+		command = command.strip().rstrip()
 		if command[0] == "#": continue
 		init = False
 		conditional = False
