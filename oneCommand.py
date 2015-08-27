@@ -104,14 +104,10 @@ if __name__ == "__main__":
 		else:
 			clock_commands.append(command_obj)
 
-
-	clock_commands.reverse()
-	init_commands.reverse()
-
 	command_obj = None
 	if len(clock_commands) or len(init_commands):
 		if mode == "m":
-			if clock_commands: data_value = 9 if commands[0].cond else 1
+			if clock_commands: data_value = 9 if clock_commands[-1].cond else 1
 
 			if len(clock_commands) == 1:
 				command_obj = nbt.cmd(format("setblock ~ ~1 ~ repeating_command_block {data} replace", data=data_value))
@@ -122,7 +118,7 @@ if __name__ == "__main__":
 				command_obj["Block"] = "minecraft:chain_command_block"
 				command_obj["Data"] = data_value
 				command_obj["Time"] = 1
-				command_obj["TileEntityData"] = {"Command": str(clock_commands[0])}
+				command_obj["TileEntityData"] = {"Command": str(clock_commands[-1])}
 
 
 
