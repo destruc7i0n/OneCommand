@@ -138,6 +138,7 @@ if supports_color():
 		BROWN = '\033[38;5;94m'
 		PEACH = '\033[38;5;208m'
 		GOLDEN = '\033[38;5;166m'
+		BOLD = '\033[1m'
 		LINE = '\033[4m'
 		REMAKELINE = '\033[F\033[K'
 		ENDC = '\033[0m'
@@ -163,6 +164,7 @@ if supports_color():
 			"brown": BROWN,
 			"peach": PEACH,
 			"golden": GOLDEN,
+			"bold": BOLD,
 			"line": LINE,
 			"endc": ENDC
 		}
@@ -192,6 +194,7 @@ else:
 		BROWN = ''
 		PEACH = ''
 		GOLDEN = ''
+		BOLD = ''
 		LINE = ''
 		REMAKELINE = ''
 		ENDC = ''
@@ -217,6 +220,7 @@ else:
 			"brown": BROWN,
 			"peach": PEACH,
 			"golden": GOLDEN,
+			"bold": BOLD,
 			"line": LINE,
 			"endc": ENDC
 		}
