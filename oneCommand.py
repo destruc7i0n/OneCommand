@@ -1,7 +1,7 @@
 from __future__ import print_function
 
 from util import *
-import nbtencoder
+import nbtencoder as nbt
 
 import argparse
 import sys, os
@@ -105,11 +105,28 @@ if __name__ == "__main__":
 			clock_commands.append(command_obj)
 
 
+	clock_commands.reverse()
+	init_commands.reverse()
+
+	command_obj = None
+	if len(clock_commands) or len(init_commands):
+		if mode == "m":
+			if clock_commands: data_value = 9 if commands[0].cond else 1
+
+			if len(clock_commands) == 1:
+				command_obj = nbt.cmd(format("setblock ~ ~1 ~ repeating_command_block {data} replace", data=data_value))
+				command_obj["Command"] = str(clock_commands[0])
+
+			elif len(clock_commands):
+				command_obj = nbt.cmd("summon FallingSand ~ ~1 ~")
+				command_obj["Block"] = "minecraft:chain_command_block"
+				command_obj["Data"] = data_value
+				command_obj["Time"] = 1
+				command_obj["TileEntityData"] = {"Command": str(clock_commands[0])}
 
 
-	final_command = ""
-	if len(commands):
-		pass # placeholder
+
+	final_command = nbt.JSON2Command(command)
 
 
 	if len(final_command) <= 32500 and final_command:
