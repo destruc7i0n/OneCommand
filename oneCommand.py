@@ -76,14 +76,12 @@ def ride(entities):
 	return absoluteTopmost
 
 if __name__ == "__main__":
-	cprint("""----------------------------------------
-	        TheDestruc7i0n's 1.9 "One Command" Creator
-	        (Type `INIT:` before a command to make it execute only once)
-	        (Type `COND:` before a command to make it conditional)
-	        (Please report bugs to me on Twitter @TheDestruc7i0n with detailed information)
-	        (A known bug is when you have only one constant command and multiple "INIT:" commands. 
-	        Also, you can't have only one "INIT:" command and no constant commands.)
-	        ----------------------------------------""", strip=True)
+	cprint("""{peach}----------------------------------------{endc}
+	  {cyan}TheDestruc7i0n{endc} and {golden}Wire Segal{endc}'s 1.9 One Command Creator
+	 {green}Prepend your command with `INIT:` to make it only run when the structure is deployed.{endc}
+	 {green}Prepend your command with `COND:` to make it a conditional command.{endc}
+	        Please report any bugs at the GitHub repo: {line}{blue}https://github.com/destruc7i0n/OneCommand/issues{endc}
+	        {peach}----------------------------------------{endc}""", strip=True)
 
 	# get mode if not specified by argument
 	if not args.mode:
