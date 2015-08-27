@@ -32,7 +32,7 @@ else:
 	import pyperclip
 
 class Command:
-	def __init__(self, cmd, conditional, init):
+	def __init__(self, cmd, init=False, conditional=False):
 		self.cmd = cmd
 		self.cond = conditional
 		self.init = init
@@ -42,9 +42,26 @@ class Command:
 		return format("{cmd}{init}{cond}",
 			cmd = self.cmd,
 			init = "\n  - Initialization" if self.init else "",
-			init = "\n  - Conditional" if self.cond else "",)
+			cond = "\n  - Conditional" if self.cond else "",)
 
 
+def generate_sand(command_obj, direction, block="chain_command_block", auto=True):
+	return {
+		"Block": block,
+		"Data": direction+8 if command_obj.cond else direction,
+		"Time": 1,
+		"TileEntityData": {
+			"Command": str(command_obj),
+			"auto": int(auto)
+		}
+	}
+
+def normal_sand(block, data=0):
+	return {
+		"Block": block,
+		"Data": data,
+		"Time": 1
+	}
 
 
 if __name__ == "__main__":
@@ -98,27 +115,40 @@ if __name__ == "__main__":
 			if command[:5] == "COND:": conditional = True
 			elif command[:5] == "INIT:": init = True
 			command = command[5:]
-		command_obj = Command(command, cond, init)
+		command_obj = Command(command, conditional=cond, init=init)
 		if init:
 			init_commands.append(command_obj)
 		else:
 			clock_commands.append(command_obj)
 
+
+
 	command_obj = None
 	if len(clock_commands) or len(init_commands):
-		if mode == "m":
-			if clock_commands: data_value = 9 if clock_commands[-1].cond else 1
+		command_sands = [normal_sand("redstone_block")]
+		for command in init_commands:
+			if command is init_commands[0]:
+				command_sands.append(generate_sand(command, 0, "command_block"))
+			else:
+				command_sands.append(generate_sand(command, 0))
 
-			if len(clock_commands) == 1:
-				command_obj = nbt.cmd(format("setblock ~ ~1 ~ repeating_command_block {data} replace", data=data_value))
-				command_obj["Command"] = str(clock_commands[0])
+		if mode == 'i':
+			offset = len(clock_commands) + 1
+			command_sands.append(generate_sand(
+				Command(format("blockdata ~ ~-{offset} ~ {auto:1b}", offset = offset)), 0
+			))
+		offset = len(init_commands) + 1
+		command_sands.append(generate_sand(
+			Command(format("fill ~ ~ ~ ~ ~{offset} ~ air", offset = offset)), 0
+		))
 
-			elif len(clock_commands):
-				command_obj = nbt.cmd("summon FallingSand ~ ~1 ~")
-				command_obj["Block"] = "minecraft:chain_command_block"
-				command_obj["Data"] = data_value
-				command_obj["Time"] = 1
-				command_obj["TileEntityData"] = {"Command": str(clock_commands[-1])}
+		for command in clock_commands[::-1]:
+			if command is clock_commands[-1]:
+				commmand_sands.append(generate_sand(command, 1, "repeating_command_block", mode == 'i'))
+			else:
+				commmand_sands.append(generate_sand(command, 1))
+
+
 
 
 
