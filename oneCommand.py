@@ -167,7 +167,7 @@ if __name__ == "__main__":
 		pyperclip.copy(final_command)
 		if not args.nocopy:
 			cprint("Command copied to clipboard.")
-			sys.stdout.write(final_command)
+			sys.stdout.write(final_command + "\n")
 	elif not final_command:
 		cprint("No command generated.", color=bcolors.RED)
 	else:
