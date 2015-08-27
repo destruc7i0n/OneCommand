@@ -12,7 +12,7 @@ cprintconf.color = bcolors.PEACH
 parser = argparse.ArgumentParser()
 parser.add_argument("-m", "--mode", help="Uses manual mode", dest="mode", default="", choices=["m", "i"])
 parser.add_argument("-f", "--command_file", help="File to load commands from", dest="filepath",
-	default=None, const="stdin", nargs="?")
+	default=None)
 parser.add_argument("-C", "--no-copy", help="Don't copy the output command", dest="nocopy", action="store_true")
 parser.add_argument("-q", "--quiet", help="Silence output", dest="quiet", action="store_true")
 parser.add_argument("-v", "--verbose", help="Detailed output", dest="loud", action="store_true")
@@ -87,16 +87,12 @@ if __name__ == "__main__":
 	commands = []
 	# get commands if file not specified
 	if not args.filepath:
-		x = 0
+		x = 1
 		command = cinput("Command {num}: ", num=x).strip().rstrip()
 		while command:
 			x += 1
 			commands.append(command)
 			command = cinput("Command {num}: ", num=x).strip().rstrip()
-	# get commands from standard in
-	elif args.filepath == "stdin":
-		commands = sys.stdin.read().split("\n")
-		sys.stdin.seek(-1, 1) # make sure no EOFs occur
 	# get commands from specified file
 	else:
 		if os.path.exists(args.filepath):
@@ -115,7 +111,7 @@ if __name__ == "__main__":
 			if command[:5] == "COND:": conditional = True
 			elif command[:5] == "INIT:": init = True
 			command = command[5:]
-		command_obj = Command(command, conditional=cond, init=init)
+		command_obj = Command(command, conditional=conditional, init=init)
 		if init:
 			init_commands.append(command_obj)
 		else:
