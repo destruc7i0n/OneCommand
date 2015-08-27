@@ -30,16 +30,6 @@ if args.nocopy:
 else:
 	import pyperclip
 
-cprint("""----------------------------------------
-          TheDestruc7i0n's 1.9 "One Command" Creator
-
-          (Type `INIT:` before a command to make it execute only once)
-          (Type `COND:` before a command to make it conditional)
-          (Please report bugs to me on Twitter @TheDestruc7i0n with detailed information)
-          (A known bug is when you have only one constant command and multiple "INIT:" commands. 
-          Also, you can't have only one "INIT:" command and no constant commands.)
-          ----------------------------------------""", strip=True)
-
 class Command:
 	def __init__(self, cmd, conditional, init):
 		self.cmd = cmd
@@ -53,7 +43,20 @@ class Command:
 			init = "\n  - Initialization" if self.init else "",
 			init = "\n  - Conditional" if self.cond else "",)
 
+
+
+
 if __name__ == "__main__":
+	cprint("""----------------------------------------
+	        TheDestruc7i0n's 1.9 "One Command" Creator
+	        (Type `INIT:` before a command to make it execute only once)
+	        (Type `COND:` before a command to make it conditional)
+	        (Please report bugs to me on Twitter @TheDestruc7i0n with detailed information)
+	        (A known bug is when you have only one constant command and multiple "INIT:" commands. 
+	        Also, you can't have only one "INIT:" command and no constant commands.)
+	        ----------------------------------------""", strip=True)
+
+	# get mode if not specified by argument
 	if not args.mode:
 		mode = cinput("Manual (m) or Instant (i)? ").strip().rstrip().lower()
 		if mode not in ["m", "i"]:
@@ -61,8 +64,10 @@ if __name__ == "__main__":
 	else:
 		mode = args.mode
 
-	commands = []
 
+
+	commands = []
+	# get commands if file not specified
 	if not args.filepath:
 		x = 0
 		command = cinput("Command {num}: ", num=x).strip().rstrip()
@@ -70,20 +75,21 @@ if __name__ == "__main__":
 			x += 1
 			commands.append(command)
 			command = cinput("Command {num}: ", num=x).strip().rstrip()
-
+	# get commands from standard in
 	elif args.filepath == "stdin":
 		commands = sys.stdin.read().split("\n")
 		sys.stdin.seek(-1, 1) # make sure no EOFs occur
-
+	# get commands from specified file
 	else:
 		if os.path.exists(args.filepath):
 			commands = open(args.filepath).read().split("\n")
 		else:
 			raise IOError(format("File {file} not found.", file=args.filepath))
 
+
 	init_commands = []
 	clock_commands = []
-
+	# do all INIT and COND checking
 	for command in commands:
 		init = False
 		conditional = False
@@ -100,6 +106,20 @@ if __name__ == "__main__":
 
 
 
+	final_command = ""
+	if len(commands):
+		pass # placeholder
+
+
+	if len(final_command) <= 32500 and final_command:
+		pyperclip.copy(final)
+		if not args.nocopy:
+			cprint("Command copied to clipboard.")
+			sys.stdout.write(final)
+	elif not final_command:
+		cprint("No command generated.", color=bcolors.RED)
+	else:
+		cprint("Command too large ({length} > 32500)", length=len(final), color=bcolors.RED)
 	# if mi:
 	# 	final = ""
 	# 	if len(commands) > 0:
