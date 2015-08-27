@@ -105,6 +105,7 @@ if __name__ == "__main__":
 	clock_commands = []
 	# do all INIT and COND checking
 	for command in commands:
+		if not command: continue
 		init = False
 		conditional = False
 		while command[:5] in ["INIT:","COND:"]:
@@ -119,7 +120,7 @@ if __name__ == "__main__":
 
 
 
-	command_obj = None
+	final_command_obj = None
 	if len(clock_commands) or len(init_commands):
 		command_sands = [normal_sand("redstone_block")]
 		for command in init_commands:
@@ -133,29 +134,29 @@ if __name__ == "__main__":
 			command_sands.append(generate_sand(
 				Command(format("blockdata ~ ~-{offset} ~ {auto:1b}", offset = offset)), 0
 			))
-		offset = len(init_commands) + 1
+		offset = len(init_commands) + 1 + int(mode == 'i')
 		command_sands.append(generate_sand(
 			Command(format("fill ~ ~ ~ ~ ~{offset} ~ air", offset = offset)), 0
 		))
 
 		for command in clock_commands[::-1]:
-			if command is clock_commands[-1]:
-				commmand_sands.append(generate_sand(command, 1, "repeating_command_block", mode == 'i'))
+			if command is clock_commands[0]:
+				command_sands.append(generate_sand(command, 1, "repeating_command_block", mode == 'i'))
 			else:
-				commmand_sands.append(generate_sand(command, 1))
+				command_sands.append(generate_sand(command, 1))
 
 
 
 
 
-	final_command = nbt.JSON2Command(command)
+	final_command = nbt.JSON2Command(final_command_obj)
 
 
 	if len(final_command) <= 32500 and final_command:
-		pyperclip.copy(final)
+		pyperclip.copy(final_command)
 		if not args.nocopy:
 			cprint("Command copied to clipboard.")
-			sys.stdout.write(final)
+			sys.stdout.write(final_command)
 	elif not final_command:
 		cprint("No command generated.", color=bcolors.RED)
 	else:
