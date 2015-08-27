@@ -136,6 +136,8 @@ if __name__ == "__main__":
 		if init_commands: command_sands.append(normal_sand("redstone_block"))
 
 		for command in init_commands:
+			if args.loud:
+				cprint(command.prettystr())
 			if command is init_commands[0]:
 				command_sands.append(generate_sand(command, 0, "command_block"))
 			else:
@@ -143,15 +145,20 @@ if __name__ == "__main__":
 
 		if mode == 'i' and clock_commands:
 			offset = len(clock_commands) + 1
-			command_sands.append(generate_sand(
-				Command(format("blockdata ~ ~-{offset} ~ {auto:1b}", offset = offset)), 0
-			))
-		offset = len(init_commands) + 1 + int(mode == 'i' and clock_commands)
-		command_sands.append(generate_sand(
-			Command(format("fill ~ ~ ~ ~ ~{offset} ~ air", offset = offset)), 0
-		))
+			blockdata = Command(format("blockdata ~ ~-{offset} ~ {auto:1b}", offset = offset), init=True)
+			if args.loud:
+				cprint(blockdata.prettystr())
+			command_sands.append(generate_sand(blockdata, 0))
+
+		offset = len(init_commands) + 1 + int(bool(mode == 'i' and clock_commands))
+		fill = Command(format("fill ~ ~ ~ ~ ~{offset} ~ air", offset = offset), init=True)
+		if args.loud:
+			cprint(fill.prettystr())
+		command_sands.append(generate_sand(fill, 0))
 
 		for command in clock_commands[::-1]:
+			if args.loud:
+				cprint(command.prettystr())
 			if command is clock_commands[0]:
 				command_sands.append(generate_sand(command, 1, "repeating_command_block", mode == 'i'))
 			else:
