@@ -146,25 +146,26 @@ if __name__ == "__main__":
 				command_sands.append(generate_sand(command, 0))
 
 		if mode == 'i' and clock_commands:
+			block = "command_block" if not init_commands else "chain_command_block"
 			offset = len(clock_commands) + 1
 			blockdata = Command(format("blockdata ~ ~-{offset} ~ {auto:1b}", offset = offset), init=True)
 			if args.loud:
 				cprint(blockdata.prettystr())
-			command_sands.append(generate_sand(blockdata, 0))
+			command_sands.append(generate_sand(blockdata, 0, block))
 
 		offset = len(init_commands) + int(bool(mode == 'i' and clock_commands))
-		fill = Command(format("fill ~ ~ ~ ~ ~{offset} ~ air", offset = offset), init=True)
-		if args.loud:
-			cprint(fill.prettystr())
-		command_sands.append(generate_sand(fill, 1))
+		if offset:
+			fill = Command(format("fill ~ ~-1 ~ ~ ~{offset} ~ air", offset = offset), init=True)
+			if args.loud:
+				cprint(fill.prettystr())
+			command_sands.append(generate_sand(fill, 0))
+			command_sands.append(normal_sand("barrier"))
 
 		for command in clock_commands[::-1]:
 			if args.loud:
 				cprint(command.prettystr())
 			if command is clock_commands[0]:
 				command_sands.append(generate_sand(command, 1, "repeating_command_block", mode == 'i'))
-			elif command is clock_commands[-1]:
-				command_sands.append(generate_sand(command, 0))
 			else:
 				command_sands.append(generate_sand(command, 1))
 		final_command_obj = nbt.cmd("summon FallingSand ~ ~1 ~ ", ride(command_sands))
