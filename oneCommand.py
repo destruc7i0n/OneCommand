@@ -31,17 +31,15 @@ if args.nocopy:
 else:
 	import pyperclip
 
-cprint("""
-----------------------------------------
-TheDestruc7i0n's 1.9 "One Command" Creator
+cprint("""----------------------------------------
+          TheDestruc7i0n's 1.9 "One Command" Creator
 
-(Type `INIT:` before a command to make it execute only once)
-(Type `COND:` before a command to make it conditional)
-(Please report bugs to me on Twitter @TheDestruc7i0n with detailed information)
-(A known bug is when you have only one constant command and multiple "INIT:" commands. 
-Also, you cannot have only one "INIT:" command and no constant commands.)
-----------------------------------------
-""")
+          (Type `INIT:` before a command to make it execute only once)
+          (Type `COND:` before a command to make it conditional)
+          (Please report bugs to me on Twitter @TheDestruc7i0n with detailed information)
+          (A known bug is when you have only one constant command and multiple "INIT:" commands. 
+          Also, you can't have only one "INIT:" command and no constant commands.)
+          ----------------------------------------""", strip=True)
 
 class Command:
 	def __init__(self, cmd, conditional):
