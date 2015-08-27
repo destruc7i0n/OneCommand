@@ -1,3 +1,4 @@
+
 import pyperclip
 
 import argparse
@@ -120,8 +121,12 @@ if mi:
 					final += str(eachCommand)+"},Data:1,Time:1,Riding:{id:FallingSand,Block:chain_command_block,TileEntityData:{Command:"
 					endBraces += 1
 		if len(final) < 32500:
+<<<<<<< HEAD
 			pyperclip.copy(final)
 			sys.stdout.write(final)
+=======
+			copy(final)
+>>>>>>> destruc7i0n/master
 			print "\nCommand (copied to clipboard): \n\n"+final
 		else:
 			raise Exception("Too Large")
@@ -141,6 +146,7 @@ else:
 				if eachCommand == commands[0]:
 					extraADD = 2 if len(once) >= 1 else 0
 					if len(commands) != 2:
+<<<<<<< HEAD
 						final = "summon FallingSand ~ ~1 ~ {Block:redstone_block,Time:1,Riding:{id:FallingSand,Block:command_block,TileEntityData:{Command:setblock ~ ~-"+str((len(commands)+len(once))+1+extraADD)+" ~ redstone_block},Data:1,Time:1,Riding:{id:FallingSand,Block:chain_command_block,TileEntityData:{"+ conditional +"Command:"+str(eachCommand)+"},Data:1,Time:1,Riding:{id:FallingSand,Block:chain_command_block,TileEntityData:{Command:"
 						endBraces += 4
 					elif len(commands) == 1:
@@ -148,6 +154,15 @@ else:
 						endBraces += 3
 					else:
 						final = "summon FallingSand ~ ~1 ~ {Block:redstone_block,Time:1,Riding:{id:FallingSand,Block:command_block,TileEntityData:{Command:setblock ~ ~-"+str((len(commands)+len(once))+1+extraADD)+" ~ redstone_block},Data:1,Time:1,Riding:{id:FallingSand,Block:chain_command_block,TileEntityData:{"+ conditional +"Command:"+str(eachCommand)
+=======
+						final = "/summon FallingSand ~ ~1 ~ {Block:redstone_block,Time:1,Riding:{id:FallingSand,Block:command_block,TileEntityData:{Command:blockdata ~ ~-"+str((len(commands)+len(once))+extraADD)+" ~ {auto:1b}},Data:1,Time:1,Riding:{id:FallingSand,Block:chain_command_block,TileEntityData:{Command:"+str(eachCommand)+"},Data:1,Time:1,Riding:{id:FallingSand,Block:chain_command_block,TileEntityData:{Command:"
+						endBraces += 4
+					elif len(commands) == 1:
+						final = "/summon FallingSand ~ ~1 ~ {Block:redstone_block,Time:1,Riding:{id:FallingSand,Block:command_block,TileEntityData:{Command:blockdata ~ ~-"+str((len(commands)+len(once))+extraADD)+" ~ {auto:1b}},Data:1,Time:1,Riding:{id:FallingSand,Block:chain_command_block,TileEntityData:{Command:"+str(eachCommand)
+						endBraces += 3
+					else:
+						final = "/summon FallingSand ~ ~1 ~ {Block:redstone_block,Time:1,Riding:{id:FallingSand,Block:command_block,TileEntityData:{Command:blockdata ~ ~-"+str((len(commands)+len(once))+extraADD)+" ~ {auto:1b}},Data:1,Time:1,Riding:{id:FallingSand,Block:chain_command_block,TileEntityData:{Command:"+str(eachCommand)
+>>>>>>> destruc7i0n/master
 						endBraces += 3
 				elif eachCommand == commands[-2]:
 					final += str(eachCommand)
@@ -163,7 +178,11 @@ else:
 								final += str(eachOnce)+"},Data:1,Time:1,Riding:{id:FallingSand,Block:chain_command_block,TileEntityData:{Command:"
 								endBraces += 1
 					else:	
+<<<<<<< HEAD
 						final += "},Data:1,Time:1,Riding:{id:FallingSand,Block:repeating_command_block,TileEntityData:{"+ conditional +"Command:"+str(eachCommand)+"},Data:1,Time:1,Riding:{id:FallingSand,Block:stone,Time:1}"
+=======
+						final += "},Data:1,Time:1,Riding:{id:FallingSand,Block:repeating_command_block,TileEntityData:{Command:"+str(eachCommand)+"},Data:1,Time:1"
+>>>>>>> destruc7i0n/master
 						endBraces += 1
 					final += "}"*endBraces
 				else:
@@ -171,8 +190,12 @@ else:
 					endBraces += 1
 
 		if len(final) < 32500:
+<<<<<<< HEAD
 			pyperclip.copy(final)
 			sys.stdout.write(final)
+=======
+			copy(final)
+>>>>>>> destruc7i0n/master
 			print "\nCommand (copied to clipboard): \n\n"+final
 		else:
 			raise Exception("Too Large")
