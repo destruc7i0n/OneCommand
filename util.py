@@ -191,6 +191,7 @@ else:
 		DARKPURPLE = ''
 		BROWN = ''
 		PEACH = ''
+		GOLDEN = ''
 		LINE = ''
 		REMAKELINE = ''
 		ENDC = ''
@@ -215,6 +216,7 @@ else:
 			"darkpurple": DARKPURPLE,
 			"brown": BROWN,
 			"peach": PEACH,
+			"golden": GOLDEN,
 			"line": LINE,
 			"endc": ENDC
 		}
