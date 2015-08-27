@@ -117,6 +117,7 @@ if __name__ == "__main__":
 	# do all INIT and COND checking
 	for command in commands:
 		if not command: continue
+		if command[0] == "#": continue
 		init = False
 		conditional = False
 		while command[:5] in ["INIT:","COND:"]:
@@ -135,8 +136,6 @@ if __name__ == "__main__":
 	if clock_commands or init_commands:
 		command_sands = []
 
-		if init_commands: command_sands.append(normal_sand("redstone_block"))
-
 		for command in init_commands:
 			if args.loud:
 				cprint(command.prettystr())
@@ -152,17 +151,19 @@ if __name__ == "__main__":
 				cprint(blockdata.prettystr())
 			command_sands.append(generate_sand(blockdata, 0))
 
-		offset = len(init_commands) + 1 + int(bool(mode == 'i' and clock_commands))
+		offset = len(init_commands) + int(bool(mode == 'i' and clock_commands))
 		fill = Command(format("fill ~ ~ ~ ~ ~{offset} ~ air", offset = offset), init=True)
 		if args.loud:
 			cprint(fill.prettystr())
-		command_sands.append(generate_sand(fill, 0))
+		command_sands.append(generate_sand(fill, 1))
 
 		for command in clock_commands[::-1]:
 			if args.loud:
 				cprint(command.prettystr())
 			if command is clock_commands[0]:
 				command_sands.append(generate_sand(command, 1, "repeating_command_block", mode == 'i'))
+			elif command is clock_commands[-1]:
+				command_sands.append(generate_sand(command, 0))
 			else:
 				command_sands.append(generate_sand(command, 1))
 		final_command_obj = nbt.cmd("summon FallingSand ~ ~1 ~ ", ride(command_sands))
