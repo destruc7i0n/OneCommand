@@ -283,7 +283,7 @@ if mi:
 					else:
 						final += "},Data:1,Time:1,Riding:{id:FallingSand,Block:repeating_command_block,TileEntityData:{Command:"+str(eachCommand)+"},Data:1,Time:1"
 						endBraces += 1
-					final += "".join(["}" for i in xrange(endBraces)])
+					final += "}"*endBraces
 				else:
 					final += str(eachCommand)+"},Data:1,Time:1,Riding:{id:FallingSand,Block:chain_command_block,TileEntityData:{Command:"
 					endBraces += 1
@@ -332,7 +332,7 @@ else:
 					else:	
 						final += "},Data:1,Time:1,Riding:{id:FallingSand,Block:repeating_command_block,TileEntityData:{Command:"+str(eachCommand)+"},Data:1,Time:1"
 						endBraces += 1
-					final += "".join(["}" for i in xrange(endBraces)])
+					final += "}"*endBraces
 				else:
 					final += str(eachCommand)+"},Data:1,Time:1,Riding:{id:FallingSand,Block:chain_command_block,TileEntityData:{Command:"
 					endBraces += 1
