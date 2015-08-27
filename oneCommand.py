@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 from util import *
+import nbtencoder
 
 import argparse
 import sys, os
@@ -120,6 +121,14 @@ if __name__ == "__main__":
 		cprint("No command generated.", color=bcolors.RED)
 	else:
 		cprint("Command too large ({length} > 32500)", length=len(final), color=bcolors.RED)
+
+
+
+
+
+
+
+
 	# if mi:
 	# 	final = ""
 	# 	if len(commands) > 0:
