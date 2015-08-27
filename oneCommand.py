@@ -53,14 +53,16 @@ def generate_sand(command_obj, direction, block="chain_command_block", auto=True
 		"TileEntityData": {
 			"Command": str(command_obj),
 			"auto": int(auto)
-		}
+		},
+		"id": "FallingSand"
 	}
 
 def normal_sand(block, data=0):
 	return {
 		"Block": block,
 		"Data": data,
-		"Time": 1
+		"Time": 1,
+		"id": "FallingSand"
 	}
 
 def ride(entities):
