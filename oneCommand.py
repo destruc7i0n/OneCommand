@@ -175,10 +175,11 @@ if __name__ == "__main__":
 
 	if len(final_command) <= 32500 and final_command:
 		pyperclip.copy(final_command)
-		if not args.nocopy:
-			cprint("Command copied to clipboard.")
-			cprint("{bold}Final command: {endc}", func=sys.stderr.write)
-			sys.stdout.write(final_command + "\n")
+		if args.nocopy:
+			cprint("{bold}Final command - {endc}", func=sys.stderr.write)
+		else:
+			cprint("{bold}Copied to clipboard - {endc}", func=sys.stderr.write)
+		sys.stdout.write(final_command + "\n")
 	elif not final_command:
 		cprint("No command generated.", color=bcolors.RED)
 	else:
