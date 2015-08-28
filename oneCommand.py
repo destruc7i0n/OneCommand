@@ -164,8 +164,8 @@ if __name__ == "__main__":
 	clock_commands = []
 	# do all INIT and COND checking
 	for command in commands:
-		if not command: continue
 		command = command.strip().rstrip()
+		if not command: continue
 		if command[0] == "#": continue
 		init = False
 		conditional = False
