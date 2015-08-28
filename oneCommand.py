@@ -52,7 +52,8 @@ def generate_sand(command_obj, direction, block="chain_command_block", auto=True
 		"Time": 1,
 		"TileEntityData": {
 			"Command": str(command_obj),
-			"auto": int(auto)
+			"auto": int(auto),
+			"TrackOutput": nbt.int_b(0)
 		},
 		"id": "FallingSand"
 	}
