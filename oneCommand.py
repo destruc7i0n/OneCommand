@@ -153,7 +153,10 @@ if __name__ == "__main__":
 			blockdata = Command(format("blockdata ~ ~-{offset} ~ {auto:1b}", offset = offset), init=True)
 			if args.loud:
 				cprint(blockdata.prettystr())
-			command_sands.append(generate_sand(blockdata, 0, block))
+			sand = generate_sand(blockdata, 0, block)
+			if not init_commands:
+				sand["TileEntityData"]["auto"] = 1
+			command_sands.append(sand)
 
 		offset = len(init_commands) + int(bool(mode == 'i' and clock_commands))
 		if offset:
