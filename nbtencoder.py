@@ -14,6 +14,15 @@ class cmd:
 	def __repr__(self):
 		return str(self)
 
+class int_b(int):
+	def __str__(self): return str(int(self)) + "b"
+class int_s(int):
+	def __str__(self): return str(int(self)) + "s"
+class int_l(int):
+	def __str__(self): return str(int(self)) + "l"
+class float_f(float):
+	def __str__(self): return str(float(self)) + "f"
+
 def JSON2Command(json):
 	command = ""
 
