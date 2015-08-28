@@ -6,7 +6,7 @@ import nbtencoder as nbt
 import argparse
 import sys, os
 
-cprintconf.name = "One Command"
+cprintconf.name = "Generator"
 cprintconf.color = bcolors.PEACH
 
 parser = argparse.ArgumentParser()
@@ -79,7 +79,7 @@ def ride(entities):
 
 if __name__ == "__main__":
 	cprint("""{peach}----------------------------------------{endc}
-	  {cyan}TheDestruc7i0n{endc} and {golden}Wire Segal{endc}'s 1.9 One Command Creator
+	  {cyan}TheDestruc7i0n{endc} and {golden}Wire Segal{endc}'s 1.9 One Command Generator
 	 {green}Prepend your command with `INIT:` to make it only run when the structure is deployed.{endc}
 	 {green}Prepend your command with `COND:` to make it a conditional command.{endc}
 	        Please report any bugs at the GitHub repo: {line}{blue}https://github.com/destruc7i0n/OneCommand/issues{endc}
