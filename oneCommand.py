@@ -149,7 +149,7 @@ if __name__ == "__main__":
 
 		if mode == 'i' and clock_commands:
 			block = "command_block" if not init_commands else "chain_command_block"
-			offset = len(clock_commands) + 1
+			offset = len(clock_commands) + 2
 			blockdata = Command(format("blockdata ~ ~-{offset} ~ {auto:1b}", offset = offset), init=True)
 			if args.loud:
 				cprint(blockdata.prettystr())
