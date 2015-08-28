@@ -45,14 +45,13 @@ class Command:
 			cond = "\n  - Conditional" if self.cond else "",)
 
 
-def generate_sand(command_obj, direction, block="chain_command_block", auto=True):
+def generate_sand(command_obj, direction, block="chain_command_block"):
 	return {
 		"Block": block,
 		"Data": direction+8 if command_obj.cond else direction,
 		"Time": 1,
 		"TileEntityData": {
 			"Command": str(command_obj),
-			"auto": int(auto),
 			"TrackOutput": nbt.int_b(0)
 		},
 		"id": "FallingSand"
@@ -142,7 +141,9 @@ if __name__ == "__main__":
 			if args.loud:
 				cprint(command.prettystr())
 			if command is init_commands[0]:
-				command_sands.append(generate_sand(command, 0, "command_block"))
+				topsand = generate_sand(command, 0, "command_block")
+				topsand["TileEntityData"]["auto"] = 1
+				command_sands.append(topsand)
 			else:
 				command_sands.append(generate_sand(command, 0))
 
@@ -166,7 +167,7 @@ if __name__ == "__main__":
 			if args.loud:
 				cprint(command.prettystr())
 			if command is clock_commands[0]:
-				command_sands.append(generate_sand(command, 1, "repeating_command_block", False))
+				command_sands.append(generate_sand(command, 1, "repeating_command_block"))
 			else:
 				command_sands.append(generate_sand(command, 1))
 		final_command_obj = nbt.cmd("summon FallingSand ~ ~1 ~ ", ride(command_sands))
