@@ -166,7 +166,7 @@ if __name__ == "__main__":
 			if args.loud:
 				cprint(command.prettystr())
 			if command is clock_commands[0]:
-				command_sands.append(generate_sand(command, 1, "repeating_command_block", mode == 'i'))
+				command_sands.append(generate_sand(command, 1, "repeating_command_block", False))
 			else:
 				command_sands.append(generate_sand(command, 1))
 		final_command_obj = nbt.cmd("summon FallingSand ~ ~1 ~ ", ride(command_sands))
