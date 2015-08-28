@@ -10,7 +10,7 @@ cprintconf.name = "Generator"
 cprintconf.color = bcolors.PEACH
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-m", "--mode", help="Uses manual mode", dest="mode", default="", choices=["m", "i"])
+parser.add_argument("-m", "--mode", help="Choose activation mode for system", dest="mode", default="", choices=["m", "i"])
 parser.add_argument("-f", "--command_file", help="File to load commands from", dest="filepath",
 	default=None)
 parser.add_argument("-C", "--no-copy", help="Don't copy the output command", dest="nocopy", action="store_true")
