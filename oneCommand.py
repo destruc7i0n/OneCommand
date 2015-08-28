@@ -16,6 +16,7 @@ parser.add_argument("-f", "--command_file", help="File to load commands from", d
 parser.add_argument("-C", "--no-copy", help="Don't copy the output command", dest="nocopy", action="store_true")
 parser.add_argument("-q", "--quiet", help="Silence output", dest="quiet", action="store_true")
 parser.add_argument("-v", "--verbose", help="Detailed output", dest="loud", action="store_true")
+parser.add_argument("-O", "--no-output", help="Don't dump cmd to STDOUT", dest="nostdout", action="store_true")
 args = parser.parse_args()
 
 if args.quiet:
@@ -42,7 +43,7 @@ class Command:
 		return format("{cmd}{init}{cond}",
 			cmd = self.cmd,
 			init = "\n  - Initialization" if self.init else "",
-			cond = "\n  - Conditional" if self.cond else "",)
+			cond = "\n  - Conditional" if self.cond else "")
 
 
 def generate_sand(command_obj, direction, block="chain_command_block"):
@@ -182,10 +183,14 @@ if __name__ == "__main__":
 	if len(final_command) <= 32500 and final_command:
 		pyperclip.copy(final_command)
 		if args.nocopy:
-			cprint("{bold}Final command - {endc}", func=sys.stderr.write)
+			cprint("{bold}Final command{endc}", func=sys.stderr.write)
 		else:
-			cprint("{bold}Copied to clipboard - {endc}", func=sys.stderr.write)
-		sys.stdout.write(final_command + "\n")
+			cprint("{bold}Copied to clipboard{endc}", func=sys.stderr.write)
+		if not args.nostdout:
+			sys.stderr.write(format("{bold} - {endc}"))
+			sys.stdout.write(final_command + "\n")
+		else:
+			sys.stderr.write(format("{bold}.\n{endc}"))
 	elif not final_command:
 		cprint("No command generated.", color=bcolors.RED)
 	else:
