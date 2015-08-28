@@ -125,6 +125,7 @@ if __name__ == "__main__":
 			if command[:5] == "COND:": conditional = True
 			elif command[:5] == "INIT:": init = True
 			command = command[5:]
+		command = command.strip().rstrip()
 		command_obj = Command(command, conditional=conditional, init=init)
 		if init:
 			init_commands.append(command_obj)
