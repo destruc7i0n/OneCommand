@@ -135,11 +135,17 @@ def parse_commands(commands):
 				while not command_split[1]:
 					command_split = command_split[:1] + command_split[2:]
 				if len(command_split) < 2: continue
-				if command_split[0] in varnames: 
-					cprint("WARNING: Duplicate variable {var}. Using first definition.", color=bcolors.YELLOW, var=command_split[0])
+				name = command_split[0]
+				contents = " ".join(command_split[1:])
+				for i in variables:
+					name = i.sub(name)
+					contents = i.sub(contents)
+
+				if name in varnames: 
+					cprint("WARNING: Duplicate variable {var}. Using first definition.", color=bcolors.YELLOW, var=name)
 				else:
-					varnames.append(command_split[0])
-					variables.append(CmdVariable(command_split[0], " ".join(command_split[1:])))
+					varnames.append()
+					variables.append(CmdVariable(name, contents))
 
 		init = False
 		conditional = False
