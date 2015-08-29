@@ -193,7 +193,7 @@ if __name__ == "__main__":
 		else:
 			cprint("{bold}Copied to clipboard{endc}", func=sys.stderr.write)
 		if not args.nostdout:
-			sys.stdout.write("\n" + final_command + "\n")
+			sys.stdout.write(final_command + "\n")
 		else:
 			sys.stderr.write(format("{bold}.\n{endc}"))
 	elif not final_command:
