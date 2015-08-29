@@ -3,6 +3,7 @@ from __future__ import print_function
 from util import *
 import nbtencoder as nbt
 
+import re
 import argparse
 import sys, os
 
@@ -19,10 +20,12 @@ parser.add_argument("-v", "--verbose", help="Detailed output", dest="loud", acti
 parser.add_argument("-O", "--no-output", help="Don't dump cmd to STDOUT", dest="nostdout", action="store_true")
 
 class Command:
-	def __init__(self, cmd, init=False, conditional=False):
+	def __init__(self, cmd, init=False, conditional=False, variables=[]):
 		self.cmd = cmd
 		self.cond = conditional
 		self.init = init
+		for i in variables:
+			self.cmd = i.sub(self.cmd)
 	def __str__(self):
 		return self.cmd
 	def prettystr(self):
@@ -30,6 +33,14 @@ class Command:
 			cmd = self.cmd,
 			init = "\n  - Initialization" if self.init else "",
 			cond = "\n  - Conditional" if self.cond else "")
+
+class CmdVariable:
+	def __init__(self, name, replacewith):
+		self.name = name
+		self.replacewith = replacewith
+		self.regex = re.compile("\\$"+name.lower(), re.IGNORECASE)
+	def sub(self, string):
+		return self.regex.sub(self.replacewith, string)
 
 
 def generate_sand(command_obj, direction, block="chain_command_block"):
@@ -99,6 +110,45 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 
 	return final_command
 
+def parse_commands(commands):
+	init_commands = []
+	clock_commands = []
+	variables = []
+	varnames = []
+	# do all INIT and COND checking
+	for command in commands:
+		command = command.strip().rstrip()
+		if not command: continue
+		if command[0] == "#": 
+			continue
+
+		if command.lower()[:7] == "define:":
+				command_split = command[7:].split()
+				while not command_split[0]:
+					command_split = command_split[1:]
+				while not command_split[1]:
+					command_split = command_split[:1] + command_split[2:]
+				if len(command_split) < 2: continue
+				if command_split[0] in varnames: 
+					cprint("WARNING: Duplicate variable {var}.", color=bcolors.YELLOW, var=command_split[0])
+				else:
+					varnames.append(command_split[0])
+					variables.append(CmdVariable(command_split[0], " ".join(command_split[1:])))
+
+		init = False
+		conditional = False
+		while command[:5].lower() in ["init:","cond:"]:
+			if command[:5].lower() == "cond:": conditional = True
+			elif command[:5].lower() == "init:": init = True
+			command = command[5:]
+		command = command.strip().rstrip()
+		command_obj = Command(command, conditional=conditional, init=init, variables=variables)
+		if init:
+			init_commands.append(command_obj)
+		else:
+			clock_commands.append(command_obj)
+	return init_commands, clock_commands
+
 def ride(entities):
 	topmost = None
 	absoluteTopmost = None
@@ -125,10 +175,12 @@ if __name__ == "__main__":
 			def paste(*args, **kwargs): pass
 	else:
 		import pyperclip
-	
+
 	cprint("""{peach}----------------------------------------{endc}
 	  {cyan}TheDestruc7i0n{endc} and {golden}Wire Segal{endc}'s 1.9 One Command Generator
 	 {green}Prepend your command with `#` to comment it out.{endc}
+	 {green}Prepend your command with `DEFINE:` to make it a variable definition.{endc}
+	        Example: `DEFINE:world hello` and `say $world` would say `hello`.
 	 {green}Prepend your command with `INIT:` to make it only run when the structure is deployed.{endc}
 	 {green}Prepend your command with `COND:` to make it a conditional command.{endc}
 	        Please report any bugs at the GitHub repo: {line}{blue}https://github.com/destruc7i0n/OneCommand/issues{endc}
@@ -141,8 +193,6 @@ if __name__ == "__main__":
 			raise ValueError("Not manual or instant")
 	else:
 		mode = args.mode
-
-
 
 	commands = []
 	# get commands if file not specified
@@ -161,25 +211,7 @@ if __name__ == "__main__":
 			raise IOError(format("File {file} not found.", file=args.filepath))
 
 
-	init_commands = []
-	clock_commands = []
-	# do all INIT and COND checking
-	for command in commands:
-		command = command.strip().rstrip()
-		if not command: continue
-		if command[0] == "#": continue
-		init = False
-		conditional = False
-		while command[:5] in ["INIT:","COND:"]:
-			if command[:5] == "COND:": conditional = True
-			elif command[:5] == "INIT:": init = True
-			command = command[5:]
-		command = command.strip().rstrip()
-		command_obj = Command(command, conditional=conditional, init=init)
-		if init:
-			init_commands.append(command_obj)
-		else:
-			clock_commands.append(command_obj)
+	init_commands, clock_commands = parse_commands(commands)
 
 
 	final_command = gen_stack(init_commands, clock_commands, mode, args.loud)
