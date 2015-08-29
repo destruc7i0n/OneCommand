@@ -18,19 +18,6 @@ parser.add_argument("-q", "--quiet", help="Silence output", dest="quiet", action
 parser.add_argument("-v", "--verbose", help="Detailed output", dest="loud", action="store_true")
 parser.add_argument("-O", "--no-output", help="Don't dump cmd to STDOUT", dest="nostdout", action="store_true")
 
-if args.quiet:
-	def cprint(*args, **kwargs):
-		pass
-
-if args.nocopy:
-	class pyperclip:
-		@staticmethod
-		def copy(*args, **kwargs): pass
-		@staticmethod
-		def paste(*args, **kwargs): pass
-else:
-	import pyperclip
-
 class Command:
 	def __init__(self, cmd, init=False, conditional=False):
 		self.cmd = cmd
@@ -126,6 +113,19 @@ def ride(entities):
 
 if __name__ == "__main__":
 	args = parser.parse_args()
+	if args.quiet:
+		def cprint(*args, **kwargs):
+			pass
+
+	if args.nocopy:
+		class pyperclip:
+			@staticmethod
+			def copy(*args, **kwargs): pass
+			@staticmethod
+			def paste(*args, **kwargs): pass
+	else:
+		import pyperclip
+	
 	cprint("""{peach}----------------------------------------{endc}
 	  {cyan}TheDestruc7i0n{endc} and {golden}Wire Segal{endc}'s 1.9 One Command Generator
 	 {green}Prepend your command with `#` to comment it out.{endc}
