@@ -74,30 +74,33 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 	if clock_commands or init_commands:
 		command_sands = []
 
+		filloffset = len(init_commands) + int(bool(mode == 'i' and clock_commands))
+		filloffset += 1*int(bool(filloffset))
+
+		if filloffset:
+			sand = normal_sand("command_block")
+			sand["TileEntityData"] = {
+				"auto": 1
+			}
+			command_sands.append(sand)
+
 		for command in init_commands:
 			if loud:
 				cprint(command.prettystr())
-			if command is init_commands[0]:
-				topsand = generate_sand(command, 0, "command_block")
-				topsand["TileEntityData"]["auto"] = 1
-				command_sands.append(topsand)
-			else:
-				command_sands.append(generate_sand(command, 0))
+			command_sands.append(generate_sand(command, 0))
 
 		if mode == 'i' and clock_commands:
-			block = "command_block" if not init_commands else "chain_command_block"
 			offset = len(clock_commands) + 2
 			blockdata = Command(format("blockdata ~ ~-{offset} ~ {auto:1b}", offset = offset), init=True)
 			if loud:
 				cprint(blockdata.prettystr())
-			sand = generate_sand(blockdata, 0, block)
+			sand = generate_sand(blockdata, 0)
 			if not init_commands:
 				sand["TileEntityData"]["auto"] = 1
 			command_sands.append(sand)
 
-		offset = len(init_commands) + int(bool(mode == 'i' and clock_commands))
-		if offset:
-			fill = Command(format("fill ~ ~-1 ~ ~ ~{offset} ~ air", offset = offset), init=True)
+		if filloffset:
+			fill = Command(format("fill ~ ~-1 ~ ~ ~{offset} ~ air", offset = filloffset), init=True)
 			if loud:
 				cprint(fill.prettystr())
 			command_sands.append(generate_sand(fill, 0))
