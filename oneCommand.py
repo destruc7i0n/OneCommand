@@ -79,7 +79,7 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 			if loud:
 				cprint(command.prettystr())
 			if command is init_commands[0]:
-				topsand = generate_sand(command, 0, "command_block")
+				topsand = generate_sand(command, 0, "command_block", False)
 				topsand["TileEntityData"]["auto"] = 1
 				command_sands.append(topsand)
 			else:
@@ -91,7 +91,7 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 			blockdata = Command(format("blockdata ~ ~-{offset} ~ {auto:1b}", offset = offset), init=True)
 			if loud:
 				cprint(blockdata.prettystr())
-			sand = generate_sand(blockdata, 0, block)
+			sand = generate_sand(blockdata, 0, block, block=="command_block")
 			if not init_commands:
 				sand["TileEntityData"]["auto"] = 1
 			command_sands.append(sand)
