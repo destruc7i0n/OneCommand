@@ -244,7 +244,8 @@ if __name__ == "__main__":
 		if not args.nostdout:
 			sys.stdout.write(final_command + "\n")
 		else:
-			sys.stderr.write(format("{bold}.\n{endc}"))
+			if not args.quiet:
+				sys.stderr.write(format("{bold}.\n{endc}"))
 	elif not final_command:
 		cprint("No command generated.", color=bcolors.RED)
 	else:
