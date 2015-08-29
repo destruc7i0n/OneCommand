@@ -144,7 +144,7 @@ def parse_commands(commands):
 				if name in varnames: 
 					cprint("WARNING: Duplicate variable {var}. Using first definition.", color=bcolors.YELLOW, var=name)
 				else:
-					varnames.append()
+					varnames.append(name)
 					variables.append(CmdVariable(name, contents))
 
 		init = False
