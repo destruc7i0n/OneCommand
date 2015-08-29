@@ -38,7 +38,7 @@ class CmdVariable:
 	def __init__(self, name, replacewith):
 		self.name = name
 		self.replacewith = replacewith
-		self.regex = re.compile("\\$"+name.lower(), re.IGNORECASE)
+		self.regex = re.compile("\\$"+name.lower()+"\\b", re.IGNORECASE)
 	def sub(self, string):
 		return self.regex.sub(self.replacewith, string)
 
