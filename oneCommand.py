@@ -17,7 +17,6 @@ parser.add_argument("-C", "--no-copy", help="Don't copy the output command", des
 parser.add_argument("-q", "--quiet", help="Silence output", dest="quiet", action="store_true")
 parser.add_argument("-v", "--verbose", help="Detailed output", dest="loud", action="store_true")
 parser.add_argument("-O", "--no-output", help="Don't dump cmd to STDOUT", dest="nostdout", action="store_true")
-args = parser.parse_args()
 
 if args.quiet:
 	def cprint(*args, **kwargs):
@@ -126,6 +125,7 @@ def ride(entities):
 	return absoluteTopmost
 
 if __name__ == "__main__":
+	args = parser.parse_args()
 	cprint("""{peach}----------------------------------------{endc}
 	  {cyan}TheDestruc7i0n{endc} and {golden}Wire Segal{endc}'s 1.9 One Command Generator
 	 {green}Prepend your command with `#` to comment it out.{endc}
