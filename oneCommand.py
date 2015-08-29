@@ -43,25 +43,32 @@ class CmdVariable:
 		return self.regex.sub(self.replacewith, string)
 
 
-def generate_sand(command_obj, direction, block="chain_command_block"):
-	return {
+def generate_sand(command_obj, direction, block="chain_command_block", have_id=True):
+	tag = {
 		"Block": block,
-		"Data": direction+8 if command_obj.cond else direction,
 		"Time": 1,
 		"TileEntityData": {
 			"Command": str(command_obj),
 			"TrackOutput": nbt.int_b(0)
-		},
-		"id": "FallingSand"
+		}
 	}
+	if have_id:
+		tag["id"] = "FallingSand"
+	data = direction+8 if command_obj.cond else direction
+	if data:
+		tag["Data"] = data
+	return tag
+
 
 def normal_sand(block, data=0):
-	return {
+	tag = {
 		"Block": block,
-		"Data": data,
 		"Time": 1,
 		"id": "FallingSand"
 	}
+	if data:
+		tag["Data"] = data
+	return tag
 
 def gen_stack(init_commands, clock_commands, mode, loud=False):
 	final_command_obj = None
