@@ -128,6 +128,7 @@ def ride(entities):
 if __name__ == "__main__":
 	cprint("""{peach}----------------------------------------{endc}
 	  {cyan}TheDestruc7i0n{endc} and {golden}Wire Segal{endc}'s 1.9 One Command Generator
+	 {green}Prepend your command with `#` to comment it out.{endc}
 	 {green}Prepend your command with `INIT:` to make it only run when the structure is deployed.{endc}
 	 {green}Prepend your command with `COND:` to make it a conditional command.{endc}
 	        Please report any bugs at the GitHub repo: {line}{blue}https://github.com/destruc7i0n/OneCommand/issues{endc}
@@ -192,11 +193,10 @@ if __name__ == "__main__":
 		else:
 			cprint("{bold}Copied to clipboard{endc}", func=sys.stderr.write)
 		if not args.nostdout:
-			sys.stderr.write(format("{bold} - {endc}"))
-			sys.stdout.write(final_command + "\n")
+			sys.stdout.write("\n" + final_command + "\n")
 		else:
 			sys.stderr.write(format("{bold}.\n{endc}"))
 	elif not final_command:
 		cprint("No command generated.", color=bcolors.RED)
 	else:
-		cprint("Command too large ({length} > 32500)", length=len(final), color=bcolors.RED)
+		cprint("Command too large ({length} > 32500)", length=len(final_command), color=bcolors.RED)
