@@ -43,17 +43,16 @@ class CmdVariable:
 		return self.regex.sub(self.replacewith, string)
 
 
-def generate_sand(command_obj, direction, block="chain_command_block", have_id=True):
+def generate_sand(command_obj, direction, block="chain_command_block"):
 	tag = {
 		"Block": block,
 		"Time": 1,
 		"TileEntityData": {
 			"Command": str(command_obj),
 			"TrackOutput": nbt.int_b(0)
-		}
+		},
+		"id": "FallingSand"
 	}
-	if have_id:
-		tag["id"] = "FallingSand"
 	data = direction+8 if command_obj.cond else direction
 	if data:
 		tag["Data"] = data
@@ -79,7 +78,7 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 			if loud:
 				cprint(command.prettystr())
 			if command is init_commands[0]:
-				topsand = generate_sand(command, 0, "command_block", False)
+				topsand = generate_sand(command, 0, "command_block")
 				topsand["TileEntityData"]["auto"] = 1
 				command_sands.append(topsand)
 			else:
@@ -91,7 +90,7 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 			blockdata = Command(format("blockdata ~ ~-{offset} ~ {auto:1b}", offset = offset), init=True)
 			if loud:
 				cprint(blockdata.prettystr())
-			sand = generate_sand(blockdata, 0, block, block=="command_block")
+			sand = generate_sand(blockdata, 0, block)
 			if not init_commands:
 				sand["TileEntityData"]["auto"] = 1
 			command_sands.append(sand)
@@ -111,7 +110,7 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 				command_sands.append(generate_sand(command, 1, "repeating_command_block"))
 			else:
 				command_sands.append(generate_sand(command, 1))
-		final_command_obj = nbt.cmd("summon FallingSand ~ ~1 ~ ", ride(command_sands))
+		final_command_obj = nbt.cmd("summon FallingSand ~ ~1 ~ ", ride(command_sands, False))
 
 	final_command = nbt.JSON2Command(final_command_obj)
 
@@ -156,7 +155,7 @@ def parse_commands(commands):
 			clock_commands.append(command_obj)
 	return init_commands, clock_commands
 
-def ride(entities):
+def ride(entities, have_id=True):
 	topmost = None
 	absoluteTopmost = None
 	
@@ -166,6 +165,7 @@ def ride(entities):
 		else:
 			topmost["Riding"] = entity
 		topmost = entity
+	if not have_id: del absoluteTopmost["id"]
 	return absoluteTopmost
 
 if __name__ == "__main__":
