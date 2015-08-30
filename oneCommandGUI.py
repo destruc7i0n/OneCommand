@@ -48,7 +48,7 @@ def showInstructions():
 
 def high(*args):
 	e1.highlight_pattern("^#.*$","grey",regexp=True)
-	e1.highlight_pattern("\$\S+","light_blue",regexp=True)
+	e1.highlight_pattern("\$\w+","light_blue",regexp=True)
 	e1.highlight_pattern("^\s*COND:","light_red",regexp=True)
 	e1.highlight_pattern("^\s*INIT:","light_green",regexp=True)
 	#e1.highlight_pattern("^\s*DEFINE:\s*\w+","light_blue",regexp=True)
@@ -96,7 +96,9 @@ def lezDoThis():
 
 l1 = Label(root,text="Input:",font = "Helvetica 14 bold").grid(row=0,column=0,pady=2,padx=5,sticky=W)
 openfile = Button(root,text="Open File",width=10,command = loadFile).grid(row=0,column=0,pady=2,padx=5,sticky=E)
-e1 = CustomText(width = 70, height=30)
+
+e1 = CustomText(width = 70, height=30,wrap=NONE)
+
 e1.grid(row=1,column=0,pady=5,padx=5)
 e1.tag_configure("grey",foreground="#606060")
 e1.tag_configure("light_red",foreground="#FF5555")
