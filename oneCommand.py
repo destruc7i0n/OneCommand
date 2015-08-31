@@ -148,7 +148,6 @@ def parse_commands(commands):
 			elif command[:5].lower() == "init:": init = True
 			command = command[5:]
 		command = command.strip().rstrip()
-		if not command: continue
 		command_obj = Command(command, conditional=conditional, init=init, variables=variables)
 		if init:
 			init_commands.append(command_obj)
@@ -205,13 +204,9 @@ if __name__ == "__main__":
 
 	# get mode if not specified by argument
 	if not args.mode:
-		if args.filepath == "stdin":
-			cprint("WARNING: When reading from STDIN, manual/instant must be specified via command line.\nUsing instant mode.", color=bcolors.YELLOW)
-			mode = "i"
-		else:
-			mode = cinput("Manual (m) or Instant (i)? ").strip().rstrip().lower()
-			if mode not in ["m", "i"]:
-				raise ValueError("Not manual or instant")
+		mode = cinput("Manual (m) or Instant (i)? ").strip().rstrip().lower()
+		if mode not in ["m", "i"]:
+			raise ValueError("Not manual or instant")
 	else:
 		mode = args.mode
 
@@ -226,9 +221,7 @@ if __name__ == "__main__":
 			command = cinput("Command {num}: ", num=x).strip().rstrip()
 	# get commands from specified file
 	else:
-		if args.filepath == "stdin":
-			commands = sys.stdin.read().split("\n")
-		elif os.path.exists(args.filepath):
+		if os.path.exists(args.filepath):
 			commands = open(args.filepath).read().split("\n")
 		else:
 			raise IOError(format("File {file} not found.", file=args.filepath))
@@ -247,11 +240,11 @@ if __name__ == "__main__":
 			cprint("{bold}Final command{endc}", func=sys.stderr.write)
 		else:
 			cprint("{bold}Copied to clipboard{endc}", func=sys.stderr.write)
-		if args.nostdout:
-			if not args.quiet: sys.stderr.write(format("{bold}.{endc}"))
-		else:
-			if not args.quiet: sys.stderr.write(format("{bold} - {endc}"))
+		if not args.nostdout:
 			sys.stdout.write(final_command + "\n")
+		else:
+			if not args.quiet:
+				sys.stderr.write(format("{bold}.\n{endc}"))
 	elif not final_command:
 		cprint("No command generated.", color=bcolors.RED)
 	else:

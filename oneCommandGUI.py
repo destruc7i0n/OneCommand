@@ -65,7 +65,7 @@ def loadFile():
 		show("No file selected.")
 
 def copyIt():
-	pyperclip.copy(out.get("0.0",END))
+	pyperclip.copy(out.get("1.0", END))
 
 def lezDoThis():
 	commands = []
@@ -82,9 +82,9 @@ def lezDoThis():
 	out.delete(1.0, END)
 	if len(final_command) <= 32500 and final_command:
 		out.insert(END, final_command)
-		leng.set(str(len(final_command))+" characters.")
+		leng.set(str(len(final_command))+" characters")
 	elif not final_command:
-		show("No command generated.")
+		show("No command generated")
 		leng.set("0 characters")
 	else:
 		show("Command too large ({length} > 32500)".format(length=str(len(final_command))))
@@ -120,7 +120,7 @@ if __name__ == "__main__":
 	rb2 = Radiobutton(root, text="Instant", variable=v,value="i",height=2,width=5, bd=4).place(relx=0.8, rely=0.3, anchor=W)
 
 	gen = Button(root,text="Generate",width=33,height=3,command=lezDoThis).place(relx=0.53, rely=0.52, anchor=W)#.grid(row=1,column=1,pady=2,padx=5,sticky=E)
-	copyit = Button(root,text="Copy",width=33,height=3).place(relx=0.77, rely=0.52, anchor=W)
+	copyit = Button(root,text="Copy",width=33,height=3,command=copyIt).place(relx=0.77, rely=0.52, anchor=W)
 
 	leng = StringVar()
 	leng.set("0 characters")
