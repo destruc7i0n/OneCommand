@@ -165,6 +165,8 @@ def parse_commands(commands):
 			command = repeat_regex.sub("", command)
 
 		command = command.strip().rstrip()
+		if not command: continue
+
 		command_obj = Command(command, block=block, conditional=conditional, init=init, variables=variables)
 		if init:
 			init_commands.append(command_obj)
