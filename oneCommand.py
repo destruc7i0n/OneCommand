@@ -240,11 +240,11 @@ if __name__ == "__main__":
 			cprint("{bold}Final command{endc}", func=sys.stderr.write)
 		else:
 			cprint("{bold}Copied to clipboard{endc}", func=sys.stderr.write)
-		if not args.nostdout:
-			sys.stdout.write(final_command + "\n")
+		if args.nostdout:
+			if not args.quiet: sys.stderr.write(format("{bold}.{endc}"))
 		else:
-			if not args.quiet:
-				sys.stderr.write(format("{bold}.\n{endc}"))
+			if not args.quiet: sys.stderr.write(format("{bold} - {endc}"))
+			sys.stdout.write(final_command + "\n")
 	elif not final_command:
 		cprint("No command generated.", color=bcolors.RED)
 	else:

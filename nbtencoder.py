@@ -30,7 +30,7 @@ def JSON2Command(json):
 		command += json.command + " "
 		command += JSON2Command(json.obj)
 		if json.as_string:
-			command.replace(ur'"', ur'\"')
+			command.replace(r'"', r'\"')
 			command = '"' + command + '"'
 
 	elif isinstance(json, dict):
@@ -60,7 +60,7 @@ def JSON2Command(json):
 
 	elif isinstance(json, str):
 		command += '"'
-		command += json.replace(ur'"', ur'\"')
+		command += json.replace(r'"', r'\"')
 		command += '"'
 
 	elif json is None:
