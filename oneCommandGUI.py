@@ -26,11 +26,7 @@ class CustomText(Text):
 			self.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
 			self.tag_add(tag, "matchStart", "matchEnd")
 
-root = Tk()
-root.resizable(width=FALSE, height=FALSE)
-root.wm_title("1.9 Command Compiler - By TheDestruc7i0n and Wire Segal")
-img = PhotoImage(file="cmd.gif")
-root.tk.call("wm", "iconphoto", root._w, img)
+
 
 def show(txt):
 	wdw = Toplevel()
@@ -69,7 +65,7 @@ def loadFile():
 		show("No file selected.")
 
 def copyIt():
-	pyperclip.copy(out.get("0.0",END))
+	pyperclip.copy(out.get("1.0", END))
 
 def lezDoThis():
 	commands = []
@@ -86,47 +82,54 @@ def lezDoThis():
 	out.delete(1.0, END)
 	if len(final_command) <= 32500 and final_command:
 		out.insert(END, final_command)
-		leng.set(str(len(final_command))+" characters.")
+		leng.set(str(len(final_command))+" characters")
 	elif not final_command:
-		show("No command generated.")
+		show("No command generated")
 		leng.set("0 characters")
 	else:
 		show("Command too large ({length} > 32500)".format(length=str(len(final_command))))
 	out.configure(state=DISABLED)
 
-l1 = Label(root,text="Input:",font = "Helvetica 14 bold").grid(row=0,column=0,pady=2,padx=5,sticky=W)
-openfile = Button(root,text="Open File",width=10,command = loadFile).grid(row=0,column=0,pady=2,padx=5,sticky=E)
+if __name__ == "__main__":
+	root = Tk()
+	root.resizable(width=FALSE, height=FALSE)
+	root.wm_title("1.9 Command Compiler - By TheDestruc7i0n and Wire Segal")
+	img = PhotoImage(file="cmd.gif")
+	root.tk.call("wm", "iconphoto", root._w, img)
 
-e1 = CustomText(width = 70, height=30,wrap=NONE)
+	l1 = Label(root,text="Input:",font = "Helvetica 14 bold").grid(row=0,column=0,pady=2,padx=5,sticky=W)
+	openfile = Button(root,text="Open File",width=10,command = loadFile).grid(row=0,column=0,pady=2,padx=5,sticky=E)
 
-e1.grid(row=1,column=0,pady=5,padx=5)
-e1.tag_configure("grey",foreground="#606060")
-e1.tag_configure("light_red",foreground="#FF5555")
-e1.tag_configure("light_green",foreground="#55FF55")
-e1.tag_configure("blue",foreground="#0000AA")
-e1.tag_configure("light_blue",foreground="#5555ff")
-e1.bind("<KeyRelease>", high)
+	e1 = CustomText(width = 70, height=30,wrap=NONE)
 
-l2 = Label(root,text="""TheDestruc7i0n and Wire Segal's 1.9 One Command Generator\nPlease report any bugs at the GitHub repo: https://github.com/destruc7i0n/OneCommand/issues""").grid(row=1,column=1,rowspan=1,sticky=W+E+N)
+	e1.grid(row=1,column=0,pady=5,padx=5)
+	e1.tag_configure("grey",foreground="#606060")
+	e1.tag_configure("light_red",foreground="#FF5555")
+	e1.tag_configure("light_green",foreground="#55FF55")
+	e1.tag_configure("blue",foreground="#0000AA")
+	e1.tag_configure("light_blue",foreground="#5555ff")
+	e1.bind("<KeyRelease>", high)
 
-showinfo = Button(root,text="Show Instructions",width=30,command=showInstructions).place(relx=0.67, rely=0.2, anchor=W)
+	l2 = Label(root,text="""TheDestruc7i0n and Wire Segal's 1.9 One Command Generator\nPlease report any bugs at the GitHub repo: https://github.com/destruc7i0n/OneCommand/issues""").grid(row=1,column=1,rowspan=1,sticky=W+E+N)
 
-v = StringVar()
-v.set("i")
-rb1 = Radiobutton(root, text="Manual", variable=v,value="m",height=2,width=5, bd=4).place(relx=0.7, rely=0.3, anchor=W)
-rb2 = Radiobutton(root, text="Instant", variable=v,value="i",height=2,width=5, bd=4).place(relx=0.8, rely=0.3, anchor=W)
+	showinfo = Button(root,text="Show Instructions",width=30,command=showInstructions).place(relx=0.67, rely=0.2, anchor=W)
 
-gen = Button(root,text="Generate",width=33,height=3,command=lezDoThis).place(relx=0.53, rely=0.52, anchor=W)#.grid(row=1,column=1,pady=2,padx=5,sticky=E)
-copyit = Button(root,text="Copy",width=33,height=3).place(relx=0.77, rely=0.52, anchor=W)
+	v = StringVar()
+	v.set("i")
+	rb1 = Radiobutton(root, text="Manual", variable=v,value="m",height=2,width=5, bd=4).place(relx=0.7, rely=0.3, anchor=W)
+	rb2 = Radiobutton(root, text="Instant", variable=v,value="i",height=2,width=5, bd=4).place(relx=0.8, rely=0.3, anchor=W)
 
-leng = StringVar()
-leng.set("0 characters")
-ccount = Label(root, textvariable=leng).place(relx=0.73, rely=0.43, anchor=W)
+	gen = Button(root,text="Generate",width=33,height=3,command=lezDoThis).place(relx=0.53, rely=0.52, anchor=W)#.grid(row=1,column=1,pady=2,padx=5,sticky=E)
+	copyit = Button(root,text="Copy",width=33,height=3,command=copyIt).place(relx=0.77, rely=0.52, anchor=W)
+
+	leng = StringVar()
+	leng.set("0 characters")
+	ccount = Label(root, textvariable=leng).place(relx=0.73, rely=0.43, anchor=W)
 
 
-out = Text(width = 60, height=13,padx=10)
-out.configure(state=NORMAL)
-out.configure(state=DISABLED)
-out.place(relx=0.53, rely=0.79, anchor=W)
+	out = Text(width = 60, height=13,padx=10)
+	out.configure(state=NORMAL)
+	out.configure(state=DISABLED)
+	out.place(relx=0.53, rely=0.79, anchor=W)
 
-mainloop()
+	mainloop()
