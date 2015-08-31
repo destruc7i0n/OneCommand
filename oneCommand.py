@@ -10,19 +10,21 @@ cprintconf.name = "Generator"
 cprintconf.color = bcolors.PEACH
 
 class Command:
-	def __init__(self, cmd, init=False, conditional=False, variables=[]):
+	def __init__(self, cmd, block="chain_command_block", init=False, conditional=False, variables=[]):
 		self.cmd = cmd
 		self.cond = conditional
 		self.init = init
+		self.block = block
 		for i in variables:
 			self.cmd = i.sub(self.cmd)
 	def __str__(self):
 		return self.cmd
 	def prettystr(self):
-		return format("{cmd}{init}{cond}",
+		return format("{cmd}{init}{cond}{repeat}",
 			cmd = self.cmd,
 			init = "\n  - Initialization" if self.init else "",
-			cond = "\n  - Conditional" if self.cond else "")
+			cond = "\n  - Conditional" if self.cond else "",
+			repeat="\n  - Repeating" if self.block == "repeating_command_block" else "")
 
 class CmdVariable:
 	def __init__(self, name, replacewith):
@@ -33,9 +35,9 @@ class CmdVariable:
 		return self.regex.sub(self.replacewith, string)
 
 
-def generate_sand(command_obj, direction, block="chain_command_block"):
+def generate_sand(command_obj, direction):
 	tag = {
-		"Block": block,
+		"Block": command_obj.block,
 		"Time": 1,
 		"TileEntityData": {
 			"Command": str(command_obj),
@@ -97,17 +99,25 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 			command_sands.append(normal_sand("barrier"))
 
 		for command in clock_commands[::-1]:
-			if loud:
-				cprint(command.prettystr())
 			if command is clock_commands[0]:
-				command_sands.append(generate_sand(command, 1, "repeating_command_block"))
+				command.block = "repeating_command_block"
+				command_sands.append(generate_sand(command, 1))
 			else:
 				command_sands.append(generate_sand(command, 1))
+			if loud:
+				cprint(command.prettystr())
 		final_command_obj = nbt.cmd("summon FallingSand ~ ~1 ~ ", ride(command_sands, False))
 
 	final_command = nbt.JSON2Command(final_command_obj)
 
 	return final_command
+
+tag_regex = re.compile(r"^\s*(INIT:|COND:|REPEAT:)", re.IGNORECASE)
+init_regex = re.compile(r"^\s*INIT:", re.IGNORECASE)
+cond_regex = re.compile(r"^\s*COND:", re.IGNORECASE)
+repeat_regex = re.compile(r"^\s*REPEAT:", re.IGNORECASE)
+define_regex = re.compile(r"^\s*DEFINE:", re.IGNORECASE)
+comment_regex = re.compile(r"^\s*#", re.IGNORECASE)
 
 def parse_commands(commands):
 	init_commands = []
@@ -117,16 +127,12 @@ def parse_commands(commands):
 	# do all INIT and COND checking
 	for command in commands:
 		command = command.strip().rstrip()
-		if not command: continue
-		if command[0] == "#": 
-			continue
+		if comment_regex.match(command): continue
 
-		if command.lower()[:7] == "define:":
+		if define_regex.match(command):
 			command_split = command[7:].split()
-			while not command_split[0]:
-				command_split = command_split[1:]
-			while not command_split[1]:
-				command_split = command_split[:1] + command_split[2:]
+			while not command_split[0]: command_split = command_split[1:]
+			while not command_split[1]: command_split = command_split[:1] + command_split[2:]
 			if len(command_split) < 2: continue
 			name = command_split[0]
 			contents = " ".join(command_split[1:])
@@ -143,12 +149,21 @@ def parse_commands(commands):
 
 		init = False
 		conditional = False
-		while command[:5].lower() in ["init:","cond:"]:
-			if command[:5].lower() == "cond:": conditional = True
-			elif command[:5].lower() == "init:": init = True
-			command = command[5:]
+		block = "chain_command_block"
+
+		while tag_regex.match(command):
+			if cond_regex.match(command): 
+				conditional = True
+				command = cond_regex.sub("", command)
+			elif init_regex.match(command): 
+				init = True
+				command = init_regex.sub("", command)
+			elif repeat_regex.match(command): 
+				block = "repeating_command_block"
+				command = repeat_regex.sub("", command)
+
 		command = command.strip().rstrip()
-		command_obj = Command(command, conditional=conditional, init=init, variables=variables)
+		command_obj = Command(command, block=block, conditional=conditional, init=init, variables=variables)
 		if init:
 			init_commands.append(command_obj)
 		else:
@@ -197,6 +212,7 @@ if __name__ == "__main__":
 	 {green}Prepend your command with `#` to comment it out.{endc}
 	 {green}Prepend your command with `DEFINE:` to make it a variable definition.{endc}
 	        Example: `DEFINE:world hello` and `say $world` would say `hello`.
+	 {green}Prepend your command with `REPEAT:` to make it a repeating command block.{endc}
 	 {green}Prepend your command with `INIT:` to make it only run when the structure is deployed.{endc}
 	 {green}Prepend your command with `COND:` to make it a conditional command.{endc}
 	        Please report any bugs at the GitHub repo: {line}{blue}https://github.com/destruc7i0n/OneCommand/issues{endc}
@@ -204,9 +220,13 @@ if __name__ == "__main__":
 
 	# get mode if not specified by argument
 	if not args.mode:
-		mode = cinput("Manual (m) or Instant (i)? ").strip().rstrip().lower()
-		if mode not in ["m", "i"]:
-			raise ValueError("Not manual or instant")
+		if args.filepath == "stdin":
+			cprint("WARNING: Mode must be specified by command line in stdin mode. Using instant mode.", color=bcolors.YELLOW)
+			mode = "i"
+		else:
+			mode = cinput("Manual (m) or Instant (i)? ").strip().rstrip().lower()
+			if mode not in ["m", "i"]:
+				raise ValueError("Not manual or instant")
 	else:
 		mode = args.mode
 
@@ -221,7 +241,9 @@ if __name__ == "__main__":
 			command = cinput("Command {num}: ", num=x).strip().rstrip()
 	# get commands from specified file
 	else:
-		if os.path.exists(args.filepath):
+		if args.filepath == "stdin":
+			commands = sys.stdin.read().split("\n")
+		elif os.path.exists(args.filepath):
 			commands = open(args.filepath).read().split("\n")
 		else:
 			raise IOError(format("File {file} not found.", file=args.filepath))
