@@ -4,20 +4,10 @@ from util import *
 import nbtencoder as nbt
 
 import re
-import argparse
 import sys, os
 
 cprintconf.name = "Generator"
 cprintconf.color = bcolors.PEACH
-
-parser = argparse.ArgumentParser()
-parser.add_argument("-m", "--mode", help="Choose activation mode for system", dest="mode", default="", choices=["m", "i"])
-parser.add_argument("-f", "--command_file", help="File to load commands from", dest="filepath", nargs="?",
-	default=None, const="stdin")
-parser.add_argument("-C", "--no-copy", help="Don't copy the output command", dest="nocopy", action="store_true")
-parser.add_argument("-q", "--quiet", help="Silence output", dest="quiet", action="store_true")
-parser.add_argument("-v", "--verbose", help="Detailed output", dest="loud", action="store_true")
-parser.add_argument("-O", "--no-output", help="Don't dump cmd to STDOUT", dest="nostdout", action="store_true")
 
 class Command:
 	def __init__(self, cmd, init=False, conditional=False, variables=[]):
@@ -180,6 +170,15 @@ def ride(entities, have_id=True):
 	return absoluteTopmost
 
 if __name__ == "__main__":
+	import argparse
+	parser = argparse.ArgumentParser()
+	parser.add_argument("-m", "--mode", help="Choose activation mode for system", dest="mode", default="", choices=["m", "i"])
+	parser.add_argument("-f", "--command_file", help="File to load commands from", dest="filepath", nargs="?",
+		default=None, const="stdin")
+	parser.add_argument("-C", "--no-copy", help="Don't copy the output command", dest="nocopy", action="store_true")
+	parser.add_argument("-q", "--quiet", help="Silence output", dest="quiet", action="store_true")
+	parser.add_argument("-v", "--verbose", help="Detailed output", dest="loud", action="store_true")
+	parser.add_argument("-O", "--no-output", help="Don't dump cmd to STDOUT", dest="nostdout", action="store_true")
 	args = parser.parse_args()
 	if args.quiet:
 		def cprint(*args, **kwargs):
