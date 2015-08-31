@@ -120,11 +120,7 @@ if __name__ == "__main__":
 	rb2 = Radiobutton(root, text="Instant", variable=v,value="i",height=2,width=5, bd=4).place(relx=0.8, rely=0.3, anchor=W)
 
 	gen = Button(root,text="Generate",width=33,height=3,command=lezDoThis).place(relx=0.53, rely=0.52, anchor=W)#.grid(row=1,column=1,pady=2,padx=5,sticky=E)
-<<<<<<< HEAD
 	copyit = Button(root,text="Copy",width=33,height=3,command=copyIt).place(relx=0.77, rely=0.52, anchor=W)
-=======
-	copyit = Button(root,text="Copy",width=33,height=3).place(relx=0.77, rely=0.52, anchor=W)
->>>>>>> origin/master
 
 	leng = StringVar()
 	leng.set("0 characters")
