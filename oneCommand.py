@@ -112,12 +112,15 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 
 	return final_command
 
-tag_regex = re.compile(r"^\s*(INIT:|COND:|REPEAT:)", re.IGNORECASE)
-init_regex = re.compile(r"^\s*INIT:", re.IGNORECASE)
-cond_regex = re.compile(r"^\s*COND:", re.IGNORECASE)
-repeat_regex = re.compile(r"^\s*REPEAT:", re.IGNORECASE)
-define_regex = re.compile(r"^\s*DEFINE:", re.IGNORECASE)
-comment_regex = re.compile(r"^\s*#", re.IGNORECASE)
+tag_regex = re.compile(r"^[ \t]*(INIT:|COND:|REPEAT:)", re.IGNORECASE)
+init_tag_regex = re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:)[ \t]*)*INIT:", re.IGNORECASE)
+cond_tag_regex = re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:)[ \t]*)*COND:", re.IGNORECASE)
+repeat_tag_regex = re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:)[ \t]*)*REPEAT:", re.IGNORECASE)
+init_regex = re.compile(r"INIT:", re.IGNORECASE)
+cond_regex = re.compile(r"COND:", re.IGNORECASE)
+repeat_regex = re.compile(r"REPEAT:", re.IGNORECASE)
+define_regex = re.compile(r"^[ \t]*DEFINE:", re.IGNORECASE)
+comment_regex = re.compile(r"^[ \t]*#", re.IGNORECASE)
 
 def parse_commands(commands):
 	init_commands = []
@@ -130,7 +133,7 @@ def parse_commands(commands):
 		if comment_regex.match(command): continue
 
 		if define_regex.match(command):
-			command_split = command[7:].split()
+			command_split = define_regex.sub("", command).split()
 			while not command_split[0]: command_split = command_split[1:]
 			while not command_split[1]: command_split = command_split[:1] + command_split[2:]
 			if len(command_split) < 2: continue
@@ -151,16 +154,15 @@ def parse_commands(commands):
 		conditional = False
 		block = "chain_command_block"
 
-		while tag_regex.match(command):
-			if cond_regex.match(command): 
-				conditional = True
-				command = cond_regex.sub("", command)
-			elif init_regex.match(command): 
-				init = True
-				command = init_regex.sub("", command)
-			elif repeat_regex.match(command): 
-				block = "repeating_command_block"
-				command = repeat_regex.sub("", command)
+		if cond_tag_regex.match(command): 
+			conditional = True
+			command = cond_regex.sub("", command)
+		if init_tag_regex.match(command): 
+			init = True
+			command = init_regex.sub("", command)
+		if repeat_tag_regex.match(command):
+			block = "repeating_command_block"
+			command = repeat_regex.sub("", command)
 
 		command = command.strip().rstrip()
 		command_obj = Command(command, block=block, conditional=conditional, init=init, variables=variables)
