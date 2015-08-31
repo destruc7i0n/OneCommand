@@ -301,7 +301,12 @@ def cprint(text, color="", strip=False, func=print, add_newline=False, colorconf
 			  text = i)) # Print all consecutive lines
 			if add_newline: func("\n")
 
-def cinput(text, color="", strip=False, func=raw_input, add_newline=False, colorconfig = None, **kwargs):
+try: 
+	single_input = raw_input
+else:
+	single_input = input
+
+def cinput(text, color="", strip=False, func=single_input, add_newline=False, colorconfig = None, **kwargs):
 	"""
 	Pretty print `text`, with `color` as its color. Take input using `func` on the last line.
 	If `strip`, then remove whitespace from both sides of each line.
