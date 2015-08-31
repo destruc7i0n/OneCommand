@@ -158,6 +158,7 @@ def parse_commands(commands):
 			elif command[:5].lower() == "init:": init = True
 			command = command[5:]
 		command = command.strip().rstrip()
+		if not command: continue
 		command_obj = Command(command, conditional=conditional, init=init, variables=variables)
 		if init:
 			init_commands.append(command_obj)
