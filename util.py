@@ -303,7 +303,7 @@ def cprint(text, color="", strip=False, func=print, add_newline=False, colorconf
 
 try: 
 	single_input = raw_input
-else:
+except:
 	single_input = input
 
 def cinput(text, color="", strip=False, func=single_input, add_newline=False, colorconfig = None, **kwargs):
