@@ -43,12 +43,22 @@ def showInstructions():
 	return show("""Prepend your command with `#` to comment it out.\nPrepend your command with `DEFINE:` to make it a variable definition.\nExample: `DEFINE:world hello` and `say $world` would say `hello`.\nPrepend your command with `INIT:` to make it only run when the structure is deployed.\nPrepend your command with `COND:` to make it a conditional command.""")
 
 def high(*args):
-	e1.highlight_pattern("^#.*$","grey",regexp=True)
-	e1.highlight_pattern("\$\w+","light_blue",regexp=True)
-	e1.highlight_pattern("^\s*COND:","light_red",regexp=True)
-	e1.highlight_pattern("^\s*INIT:","light_green",regexp=True)
-	#e1.highlight_pattern("^\s*DEFINE:\s*\w+","light_blue",regexp=True)
-	e1.highlight_pattern("^\s*DEFINE:","blue",regexp=True)
+	e1.highlight_pattern(r"^\s*#.*$","grey",regexp=True)
+	e1.highlight_pattern(r"\$\w+","light_blue",regexp=True)
+	e1.highlight_pattern(r"COND:","light_red",regexp=True)
+	e1.highlight_pattern(r"INIT:","light_green",regexp=True)
+	e1.highlight_pattern(r"^\s*DEFINE:\s*\w+","blue",regexp=True)
+	e1.highlight_pattern(r"REPEAT:","purple",regexp=True)
+	e1.highlight_pattern(r"~","purple",regexp=True)
+	e1.highlight_pattern(r"-?\d*\.\d+f?","purple",regexp=True)
+	e1.highlight_pattern(r"-?[\d][bsl]?","purple",regexp=True)
+	e1.highlight_pattern(r"!","light_red",regexp=True)
+	e1.highlight_pattern(r"@[prae]","light_blue",regexp=True)
+	e1.highlight_pattern(r'"([^"\\]*(\\.)*)*"',"yellow",regexp=True)
+	e1.highlight_pattern("\u00a7"+ur"[\da-fA-Fk-oK-OrR]?","illegal",regexp=True)
+	e1.highlight_pattern(r"false|true","purple",regexp=True)
+	e1.highlight_pattern(r"minecraft:","light_red",regexp=True)
+	e1.highlight_pattern(r"[\w_]+=[!\w_]","orange",regexp=True)
 
 def loadFile():
 	global lastpath
@@ -107,7 +117,11 @@ if __name__ == "__main__":
 	e1.tag_configure("light_red",foreground="#FF5555")
 	e1.tag_configure("light_green",foreground="#55FF55")
 	e1.tag_configure("blue",foreground="#0000AA")
+	e1.tag_configure("purple",foreground="#AA00AA")
 	e1.tag_configure("light_blue",foreground="#5555ff")
+	e1.tag_configure("yellow",foreground="#C0C03F")
+	e1.tag_configure("orange",foreground="#FFAA00")
+	e1.tag_configure("illegal",foreground="#FFFFFF",background="#FF0000")
 	e1.bind("<KeyRelease>", high)
 
 	l2 = Label(root,text="""TheDestruc7i0n and Wire Segal's 1.9 One Command Generator\nPlease report any bugs at the GitHub repo: https://github.com/destruc7i0n/OneCommand/issues""").grid(row=1,column=1,rowspan=1,sticky=W+E+N)
