@@ -3,7 +3,7 @@ A python script to generate one-command contraptions in Minecraft 1.9, by [mysel
 
 ## User Interfaces
 ### The GUI
-### [Windows Executable](https://github.com/destruc7i0n/OneCommand/releases/download/v1.0.1/OneCommandGUI.v1.0.1.zip)
+### [Windows Executable](https://github.com/destruc7i0n/OneCommand/releases/download/v1.0.1/OneCommandGUI.v1.0.1.exe)
 This Tk-written wrapper for the OneCommand library allows you to edit your commands in a clean GUI. For those not on windows, you would simply run `oneCommandGUI.py`.
 ### [Sublime Text Plugin](https://packagecontrol.io/packages/One%20Command%20Syntax%20Highlighter)
 A OneCommand syntax/generator has been written as a plugin for Sublime Text. You can check it out above, or download via [Package Control](https://packagecontrol.io).
