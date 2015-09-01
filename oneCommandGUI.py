@@ -58,7 +58,7 @@ def high(*args):
 	e1.highlight_pattern("\u00a7"+ur"[\da-fA-Fk-oK-OrR]?","illegal",regexp=True)
 	e1.highlight_pattern(r"false|true","purple",regexp=True)
 	e1.highlight_pattern(r"minecraft:","light_red",regexp=True)
-	e1.highlight_pattern(r"[\w_]+=[!\w_]","orange",regexp=True)
+	e1.highlight_pattern(r"[\w_]+=","orange",regexp=True)
 
 def loadFile():
 	global lastpath
