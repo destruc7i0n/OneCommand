@@ -103,7 +103,10 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 				command.block = "repeating_command_block"
 				command_sands.append(generate_sand(command, 1))
 			else:
-				command_sands.append(generate_sand(command, 1))
+				sand = generate_sand(command, 1)
+				if command.block == "repeating_command_block": 
+					sand["TileEntityData"]["auto"] = 1
+				command_sands.append(sand)
 			if loud:
 				cprint(command.prettystr())
 		final_command_obj = nbt.cmd("summon FallingSand ~ ~1 ~ ", ride(command_sands, False))
