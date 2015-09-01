@@ -30,7 +30,7 @@ class CmdVariable:
 	def __init__(self, name, replacewith):
 		self.name = name
 		self.replacewith = replacewith
-		self.regex = re.compile("\\$"+name.lower()+"\\b", re.IGNORECASE)
+		self.regex = re.compile(r"\$"+name.lower()+r"\b", re.IGNORECASE)
 	def sub(self, string):
 		return self.regex.sub(self.replacewith, string)
 
@@ -115,15 +115,15 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 
 	return final_command
 
-tag_regex = re.compile(r"^[ \t]*(INIT:|COND:|REPEAT:)", re.IGNORECASE)
-init_tag_regex = re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:)[ \t]*)*INIT:", re.IGNORECASE)
-cond_tag_regex = re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:)[ \t]*)*COND:", re.IGNORECASE)
+tag_regex =        re.compile(r"^[ \t]*(INIT:|COND:|REPEAT:)", re.IGNORECASE)
+init_tag_regex =   re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:)[ \t]*)*INIT:", re.IGNORECASE)
+cond_tag_regex =   re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:)[ \t]*)*COND:", re.IGNORECASE)
 repeat_tag_regex = re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:)[ \t]*)*REPEAT:", re.IGNORECASE)
-init_regex = re.compile(r"INIT:", re.IGNORECASE)
-cond_regex = re.compile(r"COND:", re.IGNORECASE)
-repeat_regex = re.compile(r"REPEAT:", re.IGNORECASE)
-define_regex = re.compile(r"^[ \t]*DEFINE:", re.IGNORECASE)
-comment_regex = re.compile(r"^[ \t]*#", re.IGNORECASE)
+init_regex =       re.compile(r"INIT:", re.IGNORECASE)
+cond_regex =       re.compile(r"COND:", re.IGNORECASE)
+repeat_regex =     re.compile(r"REPEAT:", re.IGNORECASE)
+define_regex =     re.compile(r"^[ \t]*DEFINE:", re.IGNORECASE)
+comment_regex =    re.compile(r"^[ \t]*#", re.IGNORECASE)
 
 def parse_commands(commands):
 	init_commands = []
