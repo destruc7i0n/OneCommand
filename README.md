@@ -1,5 +1,5 @@
 # OneCommand
-A python script to generate one-command contraptions in Minecraft 1.9.
+A python script to generate one-command contraptions in Minecraft 1.9, by [myself](http://thedestruc7i0n.ca) and [yrsegal](http://github.com/yrsegal).
 
 ## User Interfaces
 ### The GUI
