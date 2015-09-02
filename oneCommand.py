@@ -124,14 +124,25 @@ cond_regex =       re.compile(r"COND:", re.IGNORECASE)
 repeat_regex =     re.compile(r"REPEAT:", re.IGNORECASE)
 define_regex =     re.compile(r"^[ \t]*DEFINE:", re.IGNORECASE)
 comment_regex =    re.compile(r"^[ \t]*#", re.IGNORECASE)
+nonewline_regex =  re.compile(r"^[ \t]*-", re.IGNORECASE)
 
 def parse_commands(commands):
 	init_commands = []
 	clock_commands = []
 	variables = []
 	varnames = []
+
+	compactedcommands = []
+	next_command = ""
+	for command in commands[::-1]:
+		if nonewline_regex.match(command):
+			next_command = nonewline_regex.sub("", command).rstrip() + next_command
+		else:
+			compactedcommands.insert(0, command.rstrip() + next_command)
+			next_command = ""
+
 	# do all INIT and COND checking
-	for command in commands:
+	for command in compactedcommands:
 		command = command.strip().rstrip()
 		if comment_regex.match(command): continue
 
