@@ -24,6 +24,7 @@ Most of the differences between the OneCommand syntax and regular commands lie i
 * `INIT:` as a prepend will make the command only run once, when you run the command.
 * `COND:` as a prepend will make the command only run if the previous one was successful. Not recommended to use on the first command, nor the first `INIT:` command.
 * `REPEAT:` as a prepend will make the command in a repeating command block. This is included to allow for different-speed clocks, and similar functions.
+* `-` as a prepend will append the current line to the previous one.
 
 There's also the `DEFINE:` syntax, similar to the C `#define` directive. This allows simpler-to-read blocks of code to be written.  
 The syntax is `DEFINE: identifier replacewith`. You can then use this by calling out, anywhere in your code, `$identifier`.
