@@ -136,9 +136,9 @@ def parse_commands(commands):
 	next_command = ""
 	for command in commands[::-1]:
 		if nonewline_regex.match(command):
-			next_command = nonewline_regex.sub("", command).rstrip() + next_command
+			next_command = nonewline_regex.sub("", command).strip("\t").rstrip() + next_command
 		else:
-			compactedcommands.insert(0, command.rstrip() + next_command)
+			compactedcommands.insert(0, command.strip("\t").rstrip() + next_command)
 			next_command = ""
 
 	# do all INIT and COND checking
