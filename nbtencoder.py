@@ -22,6 +22,7 @@ class int_l(int):
 	def __str__(self): return str(int(self)) + "l"
 class float_f(float):
 	def __str__(self): return str(float(self)) + "f"
+class noquote_str(str): pass
 
 def JSON2Command(json):
 	command = ""
@@ -57,6 +58,9 @@ def JSON2Command(json):
 			if command[-1] == ",":
 				command = command[:-1]
 		command += "]"
+
+	elif isinstance(json, noquote_str):
+		command += json
 
 	elif isinstance(json, str):
 		command += '"'

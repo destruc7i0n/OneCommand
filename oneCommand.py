@@ -37,13 +37,13 @@ class CmdVariable:
 
 def generate_sand(command_obj, direction):
 	tag = {
-		"Block": command_obj.block,
+		"Block": nbt.noquote_str(command_obj.block),
 		"Time": 1,
 		"TileEntityData": {
 			"Command": str(command_obj),
 			"TrackOutput": nbt.int_b(0)
 		},
-		"id": "FallingSand"
+		"id": nbt.noquote_str("FallingSand")
 	}
 	data = direction+8 if command_obj.cond else direction
 	if data:
@@ -53,9 +53,9 @@ def generate_sand(command_obj, direction):
 
 def normal_sand(block, data=0):
 	tag = {
-		"Block": block,
+		"Block": nbt.noquote_str(block),
 		"Time": 1,
-		"id": "FallingSand"
+		"id": nbt.noquote_str("FallingSand")
 	}
 	if data:
 		tag["Data"] = data
