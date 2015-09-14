@@ -49,7 +49,7 @@ def high(*args):
 	e1.highlight_pattern(r"COND:","light_red",regexp=True)
 	e1.highlight_pattern(r"INIT:","light_green",regexp=True)
 	e1.highlight_pattern(r"^\s*DEFINE:\s*\w+","blue",regexp=True)
-	e1.highlight_pattern(r"BLOCK:[ \t]*(minecraft:)?[a-z_](:\d{1,2})?[ \t]*$","blue",regexp=True)
+	e1.highlight_pattern(r"BLOCK:[ \t]*(minecraft:)?[a-z_]+(:\d{1,2})?[ \t]*$","blue",regexp=True)
 	e1.highlight_pattern(r"REPEAT:","purple",regexp=True)
 	e1.highlight_pattern(r"~","purple",regexp=True)
 	e1.highlight_pattern(r"-?\d*\.\d+f?","purple",regexp=True)
