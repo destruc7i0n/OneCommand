@@ -281,7 +281,7 @@ def cprint(text, color="", strip=False, func=print, add_newline=False, colorconf
 
 	# Split the text by lines
 	if strip:
-		prints = [i.strip().rstrip() for i in text.split("\n")]
+		prints = [i.strip() for i in text.split("\n")]
 	else:
 		prints = text.split("\n")
 
@@ -319,7 +319,7 @@ def cinput(text, color="", strip=False, func=single_input, add_newline=False, co
 	text = format(str(text), **kwargs)
 	# Split the text by lines
 	if strip:
-		prints = [i.strip().rstrip() for i in text.split("\n")]
+		prints = [i.strip() for i in text.split("\n")]
 		prints[-1] += " " # Add a spacing to the last line
 	else:
 		prints = text.split("\n")

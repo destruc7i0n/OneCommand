@@ -26,6 +26,27 @@ class Command:
 			cond = "\n  - Conditional" if self.cond else "",
 			repeat="\n  - Repeating" if self.block == "repeating_command_block" else "")
 
+class FakeCommand:
+	hasdata_regex = re.compile(r":\d{1,2}$")
+	def __init__(self, blockname, init, variables=[]):
+		self.init = init
+		for i in variables: 
+			blockname = i.sub(blockname)
+		if self.hasdata_regex.search(blockname):
+			datastr = self.hasdata_regex.findall(blockname)
+			self.data = int(datastr[0][1:])
+		else: self.data = 0
+		self.block = self.hasdata_regex.sub("", blockname)
+	def __str__(self):
+		return format("{block}:{data}",
+			block=self.block,
+			data=self.data)
+	def prettystr(self):
+		return format("{block}{init}",
+			block = self,
+			init = "\n  - Initialization" if self.init else "")
+
+
 class CmdVariable:
 	def __init__(self, name, replacewith):
 		self.name = name
@@ -36,13 +57,15 @@ class CmdVariable:
 
 
 def generate_sand(command_obj, direction):
+	if isinstance(command_obj, FakeCommand):
+		return normal_sand(command_obj.block, command_obj.data)
 	tag = {
 		"Block": nbt.noquote_str(command_obj.block),
-		"Time": 1,
 		"TileEntityData": {
 			"Command": str(command_obj),
 			"TrackOutput": nbt.int_b(0)
 		},
+		"Time": 1,
 		"id": nbt.noquote_str("FallingSand")
 	}
 	data = direction+8 if command_obj.cond else direction
@@ -99,7 +122,7 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 			command_sands.append(normal_sand("barrier"))
 
 		for command in clock_commands[::-1]:
-			if command is clock_commands[0]:
+			if command is clock_commands[0] and isinstance(command, Command):
 				command.block = "repeating_command_block"
 				command_sands.append(generate_sand(command, 1))
 			else:
@@ -115,13 +138,12 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 
 	return final_command
 
-tag_regex =        re.compile(r"^[ \t]*(INIT:|COND:|REPEAT:)", re.IGNORECASE)
-init_tag_regex =   re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:)[ \t]*)*INIT:", re.IGNORECASE)
-cond_tag_regex =   re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:)[ \t]*)*COND:", re.IGNORECASE)
-repeat_tag_regex = re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:)[ \t]*)*REPEAT:", re.IGNORECASE)
-init_regex =       re.compile(r"INIT:", re.IGNORECASE)
-cond_regex =       re.compile(r"COND:", re.IGNORECASE)
-repeat_regex =     re.compile(r"REPEAT:", re.IGNORECASE)
+tag_regex =        re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:)[\t]*)+", re.IGNORECASE)
+init_tag_regex =   re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*INIT:", re.IGNORECASE)
+cond_tag_regex =   re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*COND:", re.IGNORECASE)
+repeat_tag_regex = re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*REPEAT:", re.IGNORECASE)
+block_tag_regex =  re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*BLOCK:[ \t]*(minecraft:)?[a-z_](:\d{1,2})?", re.IGNORECASE)
+block_regex =  re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*BLOCK:[ \t]*(minecraft:)?", re.IGNORECASE)
 define_regex =     re.compile(r"^[ \t]*DEFINE:", re.IGNORECASE)
 comment_regex =    re.compile(r"^[ \t]*#", re.IGNORECASE)
 nonewline_regex =  re.compile(r"^[ \t]*-", re.IGNORECASE)
@@ -143,7 +165,7 @@ def parse_commands(commands):
 
 	# do all INIT and COND checking
 	for command in compactedcommands:
-		command = command.strip().rstrip()
+		command = command.strip()
 		if comment_regex.match(command): continue
 
 		if define_regex.match(command):
@@ -162,30 +184,30 @@ def parse_commands(commands):
 			else:
 				varnames.append(name)
 				variables.append(CmdVariable(name, contents))
-			continue
-
-		init = False
-		conditional = False
-		block = "chain_command_block"
-
-		if cond_tag_regex.match(command): 
-			conditional = True
-			command = cond_regex.sub("", command)
-		if init_tag_regex.match(command): 
-			init = True
-			command = init_regex.sub("", command)
-		if repeat_tag_regex.match(command):
-			block = "repeating_command_block"
-			command = repeat_regex.sub("", command)
-
-		command = command.strip().rstrip()
-		if not command: continue
-
-		command_obj = Command(command, block=block, conditional=conditional, init=init, variables=variables)
-		if init:
-			init_commands.append(command_obj)
 		else:
-			clock_commands.append(command_obj)
+			init = False
+			conditional = False
+			block = "chain_command_block"
+			if cond_tag_regex.match(command): conditional = True
+			if init_tag_regex.match(command): init = True
+			if repeat_tag_regex.match(command): block = "repeating_command_block"
+			if block_tag_regex.match(command):
+				block = block_regex.sub("", command).strip()
+				if init:
+					init_commands.append(FakeCommand(block, init, variables))
+				else:
+					clock_commands.append(FakeCommand(block, init, variables))
+				continue
+
+			command = tag_regex.sub("", command).strip()
+			if not command: continue
+
+			command_obj = Command(command, block=block, conditional=conditional, init=init, variables=variables)
+			
+			if init:
+				init_commands.append(command_obj)
+			else:
+				clock_commands.append(command_obj)
 	return init_commands, clock_commands
 
 def ride(entities, have_id=True):
@@ -242,7 +264,7 @@ if __name__ == "__main__":
 			cprint("WARNING: Mode must be specified by command line in stdin mode. Using instant mode.", color=bcolors.YELLOW)
 			mode = "i"
 		else:
-			mode = cinput("Manual (m) or Instant (i)? ").strip().rstrip().lower()
+			mode = cinput("Manual (m) or Instant (i)? ").strip().lower()
 			if mode not in ["m", "i"]:
 				raise ValueError("Not manual or instant")
 	else:
@@ -252,11 +274,11 @@ if __name__ == "__main__":
 	# get commands if file not specified
 	if not args.filepath:
 		x = 1
-		command = cinput("Command {num}: ", num=x).strip().rstrip()
+		command = cinput("Command {num}: ", num=x).strip()
 		while command:
 			x += 1
 			commands.append(command)
-			command = cinput("Command {num}: ", num=x).strip().rstrip()
+			command = cinput("Command {num}: ", num=x).strip()
 	# get commands from specified file
 	else:
 		if args.filepath == "stdin":

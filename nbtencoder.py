@@ -1,6 +1,6 @@
 class cmd:
 	def __init__(self, command, obj={}, as_string=False):
-		self.command = command.strip().rstrip()
+		self.command = command.strip()
 		self.obj = obj
 		self.as_string = as_string
 	def __setitem__(self, a, b):
