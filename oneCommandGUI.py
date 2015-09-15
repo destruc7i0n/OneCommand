@@ -40,7 +40,13 @@ def show(txt):
 	#print 'done!'
 
 def showInstructions():
-	return show("""Prepend your command with `#` to comment it out.\nPrepend your command with `DEFINE:` to make it a variable definition.\nExample: `DEFINE:world hello` and `say $world` would say `hello`.\nPrepend your command with `INIT:` to make it only run when the structure is deployed.\nPrepend your command with `COND:` to make it a conditional command.""")
+	return show("""Prepend your command with `#` to comment it out.
+Prepend your command with `DEFINE:` to make it a variable definition.
+Example: `DEFINE:world hello` and `say $world` would say `hello`.
+Prepend your command with `REPEAT:` to make it a repeating command block.
+Prepend your command with `INIT:` to make it only run when the structure is deployed.
+`BLOCK:minecraft:{name}:{data}` will summon a block (thereby stopping the current `REPEAT:` signal.)
+Prepend your command with `COND:` to make it a conditional command.""")
 
 def high(*args):
 	e1.highlight_pattern(r"^\s*#.*$","grey",regexp=True)

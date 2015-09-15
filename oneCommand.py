@@ -261,6 +261,7 @@ if __name__ == "__main__":
 	        Example: `DEFINE:world hello` and `say $world` would say `hello`.
 	 {green}Prepend your command with `REPEAT:` to make it a repeating command block.{endc}
 	 {green}Prepend your command with `INIT:` to make it only run when the structure is deployed.{endc}
+	 {green}`BLOCK:minecraft:{name}:{data}` will summon a block (thereby stopping the current `REPEAT:` signal.){endc}
 	 {green}Prepend your command with `COND:` to make it a conditional command.{endc}
 	        Please report any bugs at the GitHub repo: {line}{blue}https://github.com/destruc7i0n/OneCommand/issues{endc}
 	        {peach}----------------------------------------{endc}""", strip=True)
