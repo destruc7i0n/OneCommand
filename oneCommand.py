@@ -29,6 +29,7 @@ class Command:
 class FakeCommand:
 	hasdata_regex = re.compile(r":\d{1,2}$")
 	def __init__(self, blockname, init, variables=[]):
+		self.cond = False
 		self.init = init
 		for i in variables: 
 			blockname = i.sub(blockname)
@@ -38,11 +39,11 @@ class FakeCommand:
 		else: self.data = 0
 		self.block = self.hasdata_regex.sub("", blockname)
 	def __str__(self):
-		return format("{block}:{data}",
+		return format("{block} {data}",
 			block=self.block,
 			data=self.data)
 	def prettystr(self):
-		return format("{block}{init}",
+		return format("{darkgray}{block}{init}",
 			block = self,
 			init = "\n  - Initialization" if self.init else "")
 
@@ -89,8 +90,17 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 	if clock_commands or init_commands:
 		command_sands = []
 
-		filloffset = len(init_commands) + int(bool(mode == 'i' and clock_commands))
-		filloffset += 1*int(bool(filloffset))
+		if mode == 'i':
+			repeatoffsets = [len(clock_commands) + 2]
+			for command in clock_commands:
+				if command.block == "repeating_command_block" and not command.cond:
+					repeatoffsets.append(len(clock_commands) - clock_commands.index(command) + 2 + len(repeatoffsets))
+					print(repeatoffsets[-1])
+		else:
+			repeatoffsets = []
+
+		filloffset = len(init_commands) + len(repeatoffsets)
+		if filloffset: filloffset += 1
 
 		if filloffset:
 			sand = normal_sand("command_block")
@@ -101,23 +111,21 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 
 		for command in init_commands:
 			if loud:
-				cprint(command.prettystr())
+				cprint(command.prettystr(), allow_repeat=True)
 			command_sands.append(generate_sand(command, 0))
 
-		if mode == 'i' and clock_commands:
-			offset = len(clock_commands) + 2
+		for offset in repeatoffsets[::-1]:
 			blockdata = Command(format("blockdata ~ ~-{offset} ~ {auto:1b}", offset = offset), init=True)
 			if loud:
-				cprint(blockdata.prettystr())
+				cprint(blockdata.prettystr(), allow_repeat=True)
 			sand = generate_sand(blockdata, 0)
-			if not init_commands:
-				sand["TileEntityData"]["auto"] = 1
 			command_sands.append(sand)
 
 		if filloffset:
 			fill = Command(format("fill ~ ~-1 ~ ~ ~{offset} ~ air", offset = filloffset), init=True)
 			if loud:
-				cprint(fill.prettystr())
+				cprint(fill.prettystr(), allow_repeat=True)
+			cprint("minecraft:barrier\n  - Initialization", color=bcolors.DARKGRAY, allow_repeat=True)
 			command_sands.append(generate_sand(fill, 0))
 			command_sands.append(normal_sand("barrier"))
 
@@ -127,11 +135,11 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 				command_sands.append(generate_sand(command, 1))
 			else:
 				sand = generate_sand(command, 1)
-				if command.block == "repeating_command_block": 
+				if command.block == "repeating_command_block" and command.cond: 
 					sand["TileEntityData"]["auto"] = 1
 				command_sands.append(sand)
 			if loud:
-				cprint(command.prettystr())
+				cprint(command.prettystr(), allow_repeat=True)
 		final_command_obj = nbt.cmd("summon FallingSand ~ ~1 ~ ", ride(command_sands, False))
 
 	final_command = nbt.JSON2Command(final_command_obj)
@@ -143,7 +151,7 @@ init_tag_regex =   re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*INIT
 cond_tag_regex =   re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*COND:", re.IGNORECASE)
 repeat_tag_regex = re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*REPEAT:", re.IGNORECASE)
 block_tag_regex =  re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*BLOCK:[ \t]*(minecraft:)?[a-z_](:\d{1,2})?", re.IGNORECASE)
-block_regex =  re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*BLOCK:[ \t]*(minecraft:)?", re.IGNORECASE)
+block_regex =  re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*BLOCK:[ \t]*", re.IGNORECASE)
 define_regex =     re.compile(r"^[ \t]*DEFINE:", re.IGNORECASE)
 comment_regex =    re.compile(r"^[ \t]*#", re.IGNORECASE)
 nonewline_regex =  re.compile(r"^[ \t]*-", re.IGNORECASE)

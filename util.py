@@ -262,7 +262,7 @@ cprintconf = colorconf() # create the instance of colorconf used to configure cp
 
 lastprinted = None
 
-def cprint(text, color="", strip=False, func=print, add_newline=False, colorconfig = None, **kwargs):
+def cprint(text, color="", strip=False, func=print, add_newline=False, colorconfig = None, allow_repeat=False, **kwargs):
 	"""
 	Pretty print `text`, with `color` as its color, using `func`.
 	If `strip`, then remove whitespace from both sides of each line.
@@ -276,7 +276,7 @@ def cprint(text, color="", strip=False, func=print, add_newline=False, colorconf
 	text = format(str(text), **kwargs)
 
 	# Make sure not to print the same thing twice
-	if text == lastprinted: return
+	if text == lastprinted and not allow_repeat: return
 	lastprinted = text
 
 	# Split the text by lines
