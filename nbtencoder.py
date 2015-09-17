@@ -64,7 +64,7 @@ def JSON2Command(json):
 
 	elif isinstance(json, str):
 		command += '"'
-		command += json.replace(r'"', r'\"')
+		command += json.replace('\\', '\\\\').replace(r'"', r'\"')
 		command += '"'
 
 	elif json is None:
