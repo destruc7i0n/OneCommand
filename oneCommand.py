@@ -228,13 +228,26 @@ def parse_commands(commands, context = os.path.curdir):
 			if context is None:
 				continue
 			libraryname = import_regex.sub("", command).strip()
-			if os.path.exists(os.path.join(context, libraryname)):
-				lib = open(os.path.join(context,libraryname))
-			elif os.path.exists(os.path.join(context, libraryname+".1cc")):
-				lib = open(os.path.join(context, libraryname+".1cc"))
+			if isinstance(context, str):
+				if os.path.exists(os.path.join(context, libraryname)):
+					lib = open(os.path.join(context,libraryname))
+				elif os.path.exists(os.path.join(context, libraryname+".1cc")):
+					lib = open(os.path.join(context, libraryname+".1cc"))
+				else:
+					cprint("Failed to import {lib}. File not found.", color=bcolors.RED, lib=libraryname)
+					continue
 			else:
-				cprint("Failed to import {lib}. File not found.", color=bcolors.RED, lib=libraryname)
-				continue
+				lib = None
+				for i in context:
+					if os.path.exists(os.path.join(i, libraryname)):
+						lib = open(os.path.join(i,libraryname))
+						break
+					elif os.path.exists(os.path.join(i, libraryname+".1cc")):
+						lib = open(os.path.join(i, libraryname+".1cc"))
+						break
+				if not lib:
+					cprint("Failed to import {lib}. File not found.", color=bcolors.RED, lib=libraryname)
+					continue
 
 			imported_init, imported_clock = parse_commands(lib.read().split("\n"), context)
 			init_commands += imported_init
