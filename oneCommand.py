@@ -150,14 +150,15 @@ init_tag_regex =   re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*INIT
 cond_tag_regex =   re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*COND:", re.IGNORECASE)
 repeat_tag_regex = re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*REPEAT:", re.IGNORECASE)
 block_tag_regex =  re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*BLOCK:[ \t]*(minecraft:)?[a-z_](:\d{1,2})?", re.IGNORECASE)
-block_regex =  re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*BLOCK:[ \t]*", re.IGNORECASE)
+block_regex =      re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*BLOCK:[ \t]*", re.IGNORECASE)
 define_regex =     re.compile(r"^[ \t]*DEFINE:", re.IGNORECASE)
 undefine_regex =   re.compile(r"^[ \t]*UNDEFINE:", re.IGNORECASE)
 set_regex =        re.compile(r"^[ \t]*SET:", re.IGNORECASE)
+import_regex =     re.compile(r"^[ \t]*IMPORT:", re.IGNORECASE)
 comment_regex =    re.compile(r"^[ \t]*#", re.IGNORECASE)
 nonewline_regex =  re.compile(r"^[ \t]*-", re.IGNORECASE)
 
-def parse_commands(commands):
+def parse_commands(commands, context = os.path.curdir):
 	init_commands = []
 	clock_commands = []
 	variables = []
@@ -195,6 +196,7 @@ def parse_commands(commands):
 			else:
 				varnames.append(name)
 				variables.append(CmdVariable(name, contents))
+
 		elif set_regex.match(command):
 			command_split = set_regex.sub("", command).split()
 			while not command_split[0]: command_split = command_split[1:]
@@ -213,6 +215,7 @@ def parse_commands(commands):
 				varnames.remove(name)
 			varnames.append(name)
 			variables.append(CmdVariable(name, contents))
+
 		elif undefine_regex.match(command):
 			variable = undefine_regex.sub("", command).strip().split()[0]
 			if variable in varnames:
@@ -220,6 +223,21 @@ def parse_commands(commands):
 					if i.name == name:
 						variables.remove(i)
 				varnames.remove(name)
+
+		elif import_regex.match(command):
+			libraryname = import_regex.sub("", command).strip()
+			if os.path.exists(os.path.join(context, libraryname)):
+				lib = open(os.path.join(context,libraryname))
+			elif os.path.exists(os.path.join(context, libraryname+".1cc")):
+				lib = open(os.path.join(context, libraryname+".1cc"))
+			else:
+				cprint("Failed to import {lib}. File not found.", color=bcolors.RED, lib=libraryname)
+				continue
+
+			imported_init, imported_clock = parse_commands(lib.read().split("\n"), context)
+			init_commands += imported_init
+			clock_commands += imported_clock
+
 		else:
 			init = False
 			conditional = False
@@ -312,6 +330,7 @@ if __name__ == "__main__":
 	commands = []
 	# get commands if file not specified
 	if not args.filepath:
+		context = os.path.dirname(__file__)
 		x = 1
 		command = cinput("Command {num}: ", num=x).strip()
 		while command:
@@ -322,13 +341,15 @@ if __name__ == "__main__":
 	else:
 		if args.filepath == "stdin":
 			commands = sys.stdin.read().split("\n")
+			context = os.path.dirname(__file__)
 		elif os.path.exists(args.filepath):
 			commands = open(args.filepath).read().split("\n")
+			context = os.path.dirname(args.filepath)
 		else:
 			raise IOError(format("File {file} not found.", file=args.filepath))
 
 
-	init_commands, clock_commands = parse_commands(commands)
+	init_commands, clock_commands = parse_commands(commands, context)
 
 
 	final_command = gen_stack(init_commands, clock_commands, mode, args.loud)
