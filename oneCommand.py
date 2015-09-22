@@ -230,6 +230,7 @@ def parse_commands(commands, context = None):
 			if context is None:
 				continue
 			libraryname = import_regex.sub("", command).strip()
+			if not libraryname: continue
 			if isinstance(context, str):
 				if os.path.exists(os.path.join(context, libraryname)):
 					lib = open(os.path.join(context,libraryname))
