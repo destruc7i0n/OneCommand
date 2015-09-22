@@ -158,7 +158,7 @@ import_regex =     re.compile(r"^[ \t]*IMPORT:", re.IGNORECASE)
 comment_regex =    re.compile(r"^[ \t]*#", re.IGNORECASE)
 nonewline_regex =  re.compile(r"^[ \t]*-", re.IGNORECASE)
 
-def parse_commands(commands, context = os.path.curdir):
+def parse_commands(commands, context = None):
 	init_commands = []
 	clock_commands = []
 	variables = []

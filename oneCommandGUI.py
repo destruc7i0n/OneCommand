@@ -42,7 +42,9 @@ def show(txt):
 def showInstructions():
 	return show("""Prepend your command with `#` to comment it out.
 Prepend your command with `DEFINE:` to make it a variable definition.
+Prepend your command with `SET:` to make it an overriding variable definition
 Example: `DEFINE:world hello` and `say $world` would say `hello`.
+Prepend your command with `UNDEFINE:` to make it a variable undefiner.
 Prepend your command with `REPEAT:` to make it a repeating command block.
 Prepend your command with `INIT:` to make it only run when the structure is deployed.
 `BLOCK:minecraft:{name}:{data}` will summon a block (thereby stopping the current `REPEAT:` signal.)
