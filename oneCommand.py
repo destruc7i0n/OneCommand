@@ -103,9 +103,10 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 
 		if filloffset:
 			sand = normal_sand("command_block")
-			sand["TileEntityData"] = {
-				"auto": 1
-			}
+			if mode == 'i':
+				sand["TileEntityData"] = {
+					"auto": 1
+				}
 			command_sands.append(sand)
 
 		for command in init_commands:
