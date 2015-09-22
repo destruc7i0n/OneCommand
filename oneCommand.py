@@ -218,12 +218,13 @@ def parse_commands(commands, context = None):
 			variables.append(CmdVariable(name, contents))
 
 		elif undefine_regex.match(command):
-			variable = undefine_regex.sub("", command).strip().split()[0]
-			if variable in varnames:
-				for i in variables:
-					if i.name == name:
-						variables.remove(i)
-				varnames.remove(name)
+			variables = undefine_regex.sub("", command).strip().split()
+			for variable in variables:
+				if variable and variable in varnames:
+					for i in variables:
+						if i.name == name:
+							variables.remove(i)
+					varnames.remove(name)
 
 		elif import_regex.match(command):
 			if context is None:
