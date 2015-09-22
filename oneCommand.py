@@ -346,7 +346,7 @@ if __name__ == "__main__":
 	commands = []
 	# get commands if file not specified
 	if not args.filepath:
-		context = os.path.dirname(__file__)
+		context = os.path.curdir
 		x = 1
 		command = cinput("Command {num}: ", num=x).strip()
 		while command:
