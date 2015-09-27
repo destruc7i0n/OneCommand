@@ -269,9 +269,9 @@ def parse_commands(commands, context = None, filename = None):
 		if block_tag_regex.match(command):
 			block = block_regex.sub("", command).strip()
 			if init:
-				init_commands.append(FakeCommand(block, init, variables))
+				init_commands.append(FakeCommand(block, init))
 			else:
-				clock_commands.append(FakeCommand(block, init, variables))
+				clock_commands.append(FakeCommand(block, init))
 			continue
 
 		command = tag_regex.sub("", command).strip()
@@ -350,6 +350,7 @@ if __name__ == "__main__":
 	commands = []
 	# get commands if file not specified
 	if not args.filepath:
+		filename = None
 		context = os.path.curdir
 		x = 1
 		command = cinput("Command {num}: ", num=x).strip()
@@ -360,16 +361,18 @@ if __name__ == "__main__":
 	# get commands from specified file
 	else:
 		if args.filepath == "stdin":
+			filename = None
 			commands = sys.stdin.read().split("\n")
 			context = os.path.dirname(__file__)
 		elif os.path.exists(args.filepath):
+			filename = os.path.basename(args.filepath)
 			commands = open(args.filepath).read().split("\n")
 			context = os.path.dirname(args.filepath)
 		else:
 			raise IOError(format("File {file} not found.", file=args.filepath))
 
 
-	init_commands, clock_commands = parse_commands(commands, context)
+	init_commands, clock_commands = parse_commands(commands, context, filename)
 
 
 	final_command = gen_stack(init_commands, clock_commands, mode, args.loud)
