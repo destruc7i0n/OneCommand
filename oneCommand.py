@@ -5,18 +5,17 @@ import nbtencoder as nbt
 
 import re
 import sys, os
+import time
 
 cprintconf.name = "Generator"
 cprintconf.color = bcolors.PEACH
 
 class Command:
-	def __init__(self, cmd, block="chain_command_block", init=False, conditional=False, variables=[]):
+	def __init__(self, cmd, block="chain_command_block", init=False, conditional=False):
 		self.cmd = cmd
 		self.cond = conditional
 		self.init = init
 		self.block = block
-		for i in variables:
-			self.cmd = i.sub(self.cmd)
 	def __str__(self):
 		return self.cmd
 	def prettystr(self):
@@ -28,11 +27,9 @@ class Command:
 
 class FakeCommand:
 	hasdata_regex = re.compile(r":\d{1,2}$")
-	def __init__(self, blockname, init, variables=[]):
+	def __init__(self, blockname, init):
 		self.cond = False
 		self.init = init
-		for i in variables: 
-			blockname = i.sub(blockname)
 		if self.hasdata_regex.search(blockname):
 			datastr = self.hasdata_regex.findall(blockname)
 			self.data = int(datastr[0][1:])
@@ -154,16 +151,28 @@ block_tag_regex =  re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*BLOC
 block_regex =      re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*BLOCK:[ \t]*", re.IGNORECASE)
 define_regex =     re.compile(r"^[ \t]*DEFINE:", re.IGNORECASE)
 undefine_regex =   re.compile(r"^[ \t]*UNDEFINE:", re.IGNORECASE)
-set_regex =        re.compile(r"^[ \t]*SET:", re.IGNORECASE)
 import_regex =     re.compile(r"^[ \t]*IMPORT:", re.IGNORECASE)
 comment_regex =    re.compile(r"^[ \t]*#", re.IGNORECASE)
 nonewline_regex =  re.compile(r"^[ \t]*-", re.IGNORECASE)
 
-def parse_commands(commands, context = None):
-	init_commands = []
-	clock_commands = []
-	variables = []
-	varnames = []
+def preprocess(commands, context = None, filename = None):
+	currtime = time.localtime()
+	variables = {
+		"file": CmdVariable("file", str(filename)),
+		"date": CmdVariable("date", format("{month}/{day}/{year}", # I'm american >:D
+			month = currtime.tm_mon,
+			day = currtime.tm_mday,
+			year = currtime.tm_year
+		)), 
+		"time": CmdVariable("time", format("{hour}:{minute}:{second}",
+			hour = currtime.tm_hour,
+			minute = currtime.tm_min,
+			second = currtime.tm_sec
+		))
+	}
+
+
+	outcommands = []
 
 	compactedcommands = []
 	next_command = ""
@@ -174,67 +183,45 @@ def parse_commands(commands, context = None):
 			compactedcommands.insert(0, command.replace("\t", "").rstrip() + next_command)
 			next_command = ""
 
-	# do all INIT and COND checking
+
 	for command in compactedcommands:
 		command = command.strip()
-		if comment_regex.match(command): continue
+		if not command or comment_regex.match(command): continue
+
+		for var in variables:
+			command = variables[var].sub(command)
 
 		if define_regex.match(command):
 			command_split = define_regex.sub("", command).split()
 			while not command_split[0]: command_split = command_split[1:]
 			while not command_split[1]: command_split = command_split[:1] + command_split[2:]
 			if len(command_split) < 2: continue
+
 			name = command_split[0]
 			contents = " ".join(command_split[1:])
-			for i in variables:
-				name = i.sub(name)
-				contents = i.sub(contents)
 
-			if name in varnames: 
-				cprint("""WARNING: Duplicate variable {var}. Using first definition.
-				          To overwrite the previous value of a variable, use the {bold}SET:{endc}{color} prepend.
-				          To undefine a variable, use the {bold}UNDEFINE:{endc}{color} prepend.""", color=bcolors.YELLOW, var=name, strip=True)
-			else:
-				varnames.append(name)
-				variables.append(CmdVariable(name, contents))
-
-		elif set_regex.match(command):
-			command_split = set_regex.sub("", command).split()
-			while not command_split[0]: command_split = command_split[1:]
-			while not command_split[1]: command_split = command_split[:1] + command_split[2:]
-			if len(command_split) < 2: continue
-			name = command_split[0]
-			contents = " ".join(command_split[1:])
-			for i in variables:
-				name = i.sub(name)
-				contents = i.sub(contents)
-
-			if name in varnames: 
-				for i in variables:
-					if i.name == name:
-						variables.remove(i)
-				varnames.remove(name)
-			varnames.append(name)
-			variables.append(CmdVariable(name, contents))
+			variables[name] = CmdVariable(name, contents)
 
 		elif undefine_regex.match(command):
-			variables = undefine_regex.sub("", command).strip().split()
-			for variable in variables:
-				if variable and variable in varnames:
-					for i in variables:
-						if i.name == name:
-							variables.remove(i)
-					varnames.remove(name)
+			variables_to_remove = undefine_regex.sub("", command).strip().split()
+			for var in variables_to_remove:
+				if var in variables:
+					del variables[var]
 
 		elif import_regex.match(command):
-			if context is None:
-				continue
+			if context is None: continue
+
 			libraryname = import_regex.sub("", command).strip()
 			if not libraryname: continue
+
 			if isinstance(context, str):
 				if os.path.exists(os.path.join(context, libraryname)):
+					importedcontext = context
+					importedname = libraryname
 					lib = open(os.path.join(context,libraryname))
 				elif os.path.exists(os.path.join(context, libraryname+".1cc")):
+					importedcontext = context
+					importedname = libraryname+".1cc"
 					lib = open(os.path.join(context, libraryname+".1cc"))
 				else:
 					cprint("Failed to import {lib}. File not found.", color=bcolors.RED, lib=libraryname)
@@ -243,43 +230,59 @@ def parse_commands(commands, context = None):
 				lib = None
 				for i in context:
 					if os.path.exists(os.path.join(i, libraryname)):
+						importedcontext = i
+						importedname = libraryname
 						lib = open(os.path.join(i,libraryname))
 						break
 					elif os.path.exists(os.path.join(i, libraryname+".1cc")):
+						importedcontext = i
+						importedname = libraryname+".1cc"
 						lib = open(os.path.join(i, libraryname+".1cc"))
 						break
 				if not lib:
 					cprint("Failed to import {lib}. File not found.", color=bcolors.RED, lib=libraryname)
 					continue
 
-			imported_init, imported_clock = parse_commands(lib.read().split("\n"), context)
-			init_commands += imported_init
-			clock_commands += imported_clock
-
+			outcommands += preprocess(lib.read().split("\n"), importedcontext, importedname)
 		else:
-			init = False
-			conditional = False
-			block = "chain_command_block"
-			if cond_tag_regex.match(command): conditional = True
-			if init_tag_regex.match(command): init = True
-			if repeat_tag_regex.match(command): block = "repeating_command_block"
-			if block_tag_regex.match(command):
-				block = block_regex.sub("", command).strip()
-				if init:
-					init_commands.append(FakeCommand(block, init, variables))
-				else:
-					clock_commands.append(FakeCommand(block, init, variables))
-				continue
+			outcommands.append(command)
+	return outcommands
 
-			command = tag_regex.sub("", command).strip()
-			if not command: continue
-
-			command_obj = Command(command, block=block, conditional=conditional, init=init, variables=variables)
 			
+
+
+
+def parse_commands(commands, context = None, filename = None):
+	init_commands = []
+	clock_commands = []
+
+	commands = preprocess(commands, context, filename)
+
+	# do all INIT and COND checking
+	for command in commands:
+		init = False
+		conditional = False
+		block = "chain_command_block"
+		if cond_tag_regex.match(command): conditional = True
+		if init_tag_regex.match(command): init = True
+		if repeat_tag_regex.match(command): block = "repeating_command_block"
+		if block_tag_regex.match(command):
+			block = block_regex.sub("", command).strip()
 			if init:
-				init_commands.append(command_obj)
+				init_commands.append(FakeCommand(block, init, variables))
 			else:
-				clock_commands.append(command_obj)
+				clock_commands.append(FakeCommand(block, init, variables))
+			continue
+
+		command = tag_regex.sub("", command).strip()
+		if not command: continue
+
+		command_obj = Command(command, block=block, conditional=conditional, init=init)
+		
+		if init:
+			init_commands.append(command_obj)
+		else:
+			clock_commands.append(command_obj)
 	return init_commands, clock_commands
 
 def ride(entities, have_id=True):
@@ -323,7 +326,6 @@ if __name__ == "__main__":
 	  {cyan}TheDestruc7i0n{endc} and {golden}Wire Segal{endc}'s 1.9 One Command Generator
 	 {green}Prepend your command with `#` to comment it out.{endc}
 	 {green}Prepend your command with `DEFINE:` to make it a variable definition.{endc}
-	 {green}Prepend your command with `SET:` to make it an overriding variable definition.{endc}
 	        Example: `DEFINE:world hello` and `say $world` would say `hello`.
 	 {green}Prepend your command with `UNDEFINE:` to make it a variable undefiner.{endc}
 	 {green}Prepend your command with `REPEAT:` to make it a repeating command block.{endc}
