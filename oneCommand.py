@@ -80,7 +80,7 @@ class CmdMacro:
 				try:
 					output = self.function(self.replacewith, self.params, parsedparams)
 				except:
-					cprint("{params} not a valid argument list for ${funcname}.", color=bcolors.RED, params=params, funcname=self.name)
+					cprint("{params} is not a valid argument list for ${funcname}.", color=bcolors.RED, params=params, funcname=self.name)
 					output = ""
 				string = string.replace(find.group(), output)
 		return string
