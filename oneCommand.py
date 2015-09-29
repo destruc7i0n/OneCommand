@@ -57,7 +57,7 @@ def macrofunc(string, params, args):
 	return string
 
 class CmdMacro:
-	param = r"\(((-?\d+(\.\d+)?|\"([^\"\\]*(\\.)*)*\"),\s*?)*(-?\d+(\.\d+)?|\"([^\"\\]*(\\.)*)*\")\)"
+	param = r"\((((-?\d+(\.\d+)?|\"([^\"\\]*(\\.)*)*\"),\s*?)*(-?\d+(\.\d+)?|\"([^\"\\]*(\\.)*)*\"))?\)"
 	param_regex = re.compile(param)
 	def __init__(self, name, params, replacewith, function=macrofunc):
 		self.name = name
@@ -74,9 +74,10 @@ class CmdMacro:
 				paraml = params.split(",")
 				parsedparams = []
 				for i in paraml:
-					if i[0] == '"':
-						i = i[1:-1].replace('\\"', '"').replace('\\\\', '\\')
-					parsedparams.append(i)
+					if i:
+						if i[0] == '"':
+							i = i[1:-1].replace('\\"', '"').replace('\\\\', '\\')
+						parsedparams.append(i)
 				try:
 					output = self.function(self.replacewith, self.params, parsedparams)
 				except:
