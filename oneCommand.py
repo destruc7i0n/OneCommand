@@ -57,7 +57,7 @@ def macrofunc(string, params, args):
 	return string
 
 class CmdMacro:
-	param = r"\((((-?\d+(\.\d+)?|\"([^\"\\]*(\\.)*)*\"),\s*?)*(-?\d+(\.\d+)?|\"([^\"\\]*(\\.)*)*\"))?\)"
+	param = r"\((?:(?:(?:-?\d+(?:\.\d+)?|\"(?:[^\"\\]*(?:\\.)*)*\"),\s*)*(?:-?\d+(?:\.\d+)?|\"(?:[^\"\\]*(?:\\.)*)*\"))?\)"
 	param_regex = re.compile(param)
 	def __init__(self, name, params, replacewith, function=macrofunc):
 		self.name = name
