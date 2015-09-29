@@ -71,13 +71,17 @@ class CmdMacro:
 			for find in found:
 				params = self.param_regex.search(find.group()).group()[1:-1]
 				params = re.sub(r",\s", ",", params)
-				params = params.split(",")
+				paraml = params.split(",")
 				parsedparams = []
-				for i in params:
+				for i in paraml:
 					if i[0] == '"':
 						i = i[1:-1].replace('\\"', '"').replace('\\\\', '\\')
 					parsedparams.append(i)
-				output = self.function(self.replacewith, self.params, parsedparams)
+				try:
+					output = self.function(self.replacewith, self.params, parsedparams)
+				except:
+					cprint("{params} not a valid argument list for ${funcname}.", color=bcolors.RED, params=params, funcname=self.name)
+					output = ""
 				string = string.replace(find.group(), output)
 		return string
 
