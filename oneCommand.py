@@ -53,7 +53,7 @@ class CmdVariable:
 
 def macrofunc(string, params, args):
 	for i in range(min(len(args), len(params))):
-		string = re.sub(r"\b" + params[i] + r"\b", args[i], string)
+		string = re.sub(r"\|" + params[i] + r"\|", args[i], string)
 	return string
 
 class CmdMacro:
@@ -81,17 +81,20 @@ class CmdMacro:
 				string = string.replace(find.group(), output)
 		return string
 
-sin = lambda string, params, args: str(math.sin(math.radians(float(args[0]))))
-cos = lambda string, params, args: str(math.sin(math.radians(float(args[0]))))
-tan = lambda string, params, args: str(math.sin(math.radians(float(args[0]))))
-sinr= lambda string, params, args: str(math.sin(float(args[0])))
-cosr= lambda string, params, args: str(math.sin(float(args[0])))
-tanr= lambda string, params, args: str(math.sin(float(args[0])))
-add = lambda string, params, args: str(float(args[0]) + float(args[1]))
-sub = lambda string, params, args: str(float(args[0]) - float(args[1]))
-mul = lambda string, params, args: str(float(args[0]) * float(args[1]))
-div = lambda string, params, args: str(float(args[0]) / float(args[1]))
-pow_l=lambda string, params, args: str(float(args[0]) **float(args[1]))
+sin = lambda string, params, args: repr(math.sin(math.radians(float(args[0]))))
+cos = lambda string, params, args: repr(math.sin(math.radians(float(args[0]))))
+tan = lambda string, params, args: repr(math.sin(math.radians(float(args[0]))))
+sinr= lambda string, params, args: repr(math.sin(float(args[0])))
+cosr= lambda string, params, args: repr(math.sin(float(args[0])))
+tanr= lambda string, params, args: repr(math.sin(float(args[0])))
+floor=lambda string, params, args: repr(int(math.floor(float(args[0]))))
+ceil= lambda string, params, args: repr(int(math.ceil(float(args[0]))))
+rnd_l=lambda string, params, args: repr(round(float(args[0]), int(args[1])))
+add = lambda string, params, args: repr(float(args[0]) + float(args[1]))
+sub = lambda string, params, args: repr(float(args[0]) - float(args[1]))
+mul = lambda string, params, args: repr(float(args[0]) * float(args[1]))
+div = lambda string, params, args: repr(float(args[0]) / float(args[1]))
+pow_l=lambda string, params, args: repr(float(args[0]) **float(args[1]))
 
 
 def generate_sand(command_obj, direction):
@@ -212,16 +215,19 @@ def preprocess(commands, context = None, filename = None):
 			minute = currtime.tm_min,
 			second = currtime.tm_sec
 		)),
-		"pi": CmdVariable("pi", str(math.pi)),
-		"e": CmdVariable("e", str(math.e))
+		"pi": CmdVariable("pi", repr(math.pi)),
+		"e": CmdVariable("e", repr(math.e))
 	}
 	functions = {
 		"sin": CmdMacro("sin", [], "", sin),
 		"cos": CmdMacro("cos", [], "", cos),
 		"tan": CmdMacro("tan", [], "", tan),
-		"sinr":CmdMacro("sinr",[], "", sinr),
-		"cosr":CmdMacro("cosr",[], "", cosr),
-		"tanr":CmdMacro("tanr",[], "", tanr),
+		"sinr": CmdMacro("sinr", [], "", sinr),
+		"cosr": CmdMacro("cosr", [], "", cosr),
+		"tanr": CmdMacro("tanr", [], "", tanr),
+		"floor": CmdMacro("floor", [], "", floor),
+		"ceil": CmdMacro("ceil", [], "", ceil),
+		"round": CmdMacro("round", [], "", rnd_l),
 		"add": CmdMacro("add", [], "", add),
 		"sub": CmdMacro("sub", [], "", sub),
 		"mul": CmdMacro("mul", [], "", mul),
