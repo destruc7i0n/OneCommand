@@ -57,7 +57,7 @@ def macrofunc(string, params, args):
 	return string
 
 class CmdMacro:
-	param = r"\(((\d+|\"([^\"\\]*(\\.)*)*\"),\s*?)*(\d+|\"([^\"\\]*(\\.)*)*\")\)"
+	param = r"\(((\d+(\.\d+)?|\"([^\"\\]*(\\.)*)*\"),\s*?)*(\d+(\.\d+)?|\"([^\"\\]*(\\.)*)*\")\)"
 	param_regex = re.compile(param)
 	def __init__(self, name, params, replacewith, function=macrofunc):
 		self.name = name
@@ -84,6 +84,9 @@ class CmdMacro:
 sin = lambda string, params, args: str(math.sin(math.radians(float(args[0]))))
 cos = lambda string, params, args: str(math.sin(math.radians(float(args[0]))))
 tan = lambda string, params, args: str(math.sin(math.radians(float(args[0]))))
+sinr= lambda string, params, args: str(math.sin(float(args[0])))
+cosr= lambda string, params, args: str(math.sin(float(args[0])))
+tanr= lambda string, params, args: str(math.sin(float(args[0])))
 add = lambda string, params, args: str(float(args[0]) + float(args[1]))
 sub = lambda string, params, args: str(float(args[0]) - float(args[1]))
 mul = lambda string, params, args: str(float(args[0]) * float(args[1]))
@@ -216,6 +219,9 @@ def preprocess(commands, context = None, filename = None):
 		"sin": CmdMacro("sin", [], "", sin),
 		"cos": CmdMacro("cos", [], "", cos),
 		"tan": CmdMacro("tan", [], "", tan),
+		"sinr":CmdMacro("sinr",[], "", sinr),
+		"cosr":CmdMacro("cosr",[], "", cosr),
+		"tanr":CmdMacro("tanr",[], "", tanr),
 		"add": CmdMacro("add", [], "", add),
 		"sub": CmdMacro("sub", [], "", sub),
 		"mul": CmdMacro("mul", [], "", mul),
