@@ -70,6 +70,7 @@ def high(*args):
 	e1.highlight_pattern(r"false|true","purple",regexp=True)
 	e1.highlight_pattern(r"minecraft:","light_red",regexp=True)
 	e1.highlight_pattern(r"[\w_]+=","orange",regexp=True)
+	e1.highlight_pattern(r"\|[\w_]\|","orange",regexp=True)
 
 def loadFile():
 	global lastpath
