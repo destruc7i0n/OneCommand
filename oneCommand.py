@@ -244,17 +244,17 @@ def preprocess(commands, context = None, filename = None):
 	compactedcommands = []
 	cindex = 0
 	while cindex < len(commands):
-		command = line_var_regex.sub(str(cindex), commands[cindex])
+		command = line_var_regex.sub(str(cindex+1), commands[cindex])
 		if skipnewline_regex.search(command):
 			new_command = skipnewline_regex.sub("", command)
 			next_command = "\\"
 			while skipnewline_regex.search(next_command):
 				if cindex != len(commands)-1:
 					cindex += 1
-					next_command = line_var_regex.sub(str(cindex), commands[cindex])
+					next_command = line_var_regex.sub(str(cindex+1), commands[cindex])
 				else:
 					next_command = ""
-				new_command += next_command.strip()
+				new_command += skipnewline_regex.sub("", next_command.strip())
 			compactedcommands.append(new_command)
 		else:
 			compactedcommands.append(command)
