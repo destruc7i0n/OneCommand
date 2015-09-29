@@ -3,9 +3,7 @@ from __future__ import print_function
 from util import *
 import nbtencoder as nbt
 
-import re
-import sys, os
-import time
+import math
 
 cprintconf.name = "Generator"
 cprintconf.color = bcolors.PEACH
@@ -68,9 +66,6 @@ class CmdMacro:
 		self.regex = re.compile(r"\$"+name.lower()+self.param, re.IGNORECASE)
 		self.function = function
 	def sub(self, string):
-		# print(string)
-		# print(self.regex.search(string))
-		# print(self.name)
 		while self.regex.search(string):
 			found = self.regex.finditer(string)
 			for find in found:
@@ -86,7 +81,6 @@ class CmdMacro:
 				string = string.replace(find.group(), output)
 		return string
 
-import math
 sin = lambda string, params, args: str(math.sin(math.radians(float(args[0]))))
 cos = lambda string, params, args: str(math.sin(math.radians(float(args[0]))))
 tan = lambda string, params, args: str(math.sin(math.radians(float(args[0]))))
@@ -214,7 +208,9 @@ def preprocess(commands, context = None, filename = None):
 			hour = currtime.tm_hour,
 			minute = currtime.tm_min,
 			second = currtime.tm_sec
-		))
+		)),
+		"pi": CmdVariable("pi", str(math.pi)),
+		"e": CmdVariable("e", str(math.e))
 	}
 	functions = {
 		"sin": CmdMacro("sin", [], "", sin),
