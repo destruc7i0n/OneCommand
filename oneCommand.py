@@ -191,21 +191,21 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 
 	return final_command
 
-tag_regex =        re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:)[\t]*)+", re.IGNORECASE)
-init_tag_regex =   re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*INIT:", re.IGNORECASE)
-cond_tag_regex =   re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*COND:", re.IGNORECASE)
-repeat_tag_regex = re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*REPEAT:", re.IGNORECASE)
-block_tag_regex =  re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*BLOCK:[ \t]*(minecraft:)?[a-z_](:\d{1,2})?", re.IGNORECASE)
-block_regex =      re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*BLOCK:[ \t]*", re.IGNORECASE)
-define_regex =     re.compile(r"^[ \t]*DEFINE:", re.IGNORECASE)
-word_regex =       re.compile(r"\w+") # this regex has had me laughing for a while, but i need it
-param_regex =      re.compile(r"\((\w+,)*\w+\)")
-macro_regex =      re.compile(r"\w+\((\w+,)*\w+\)")
-undefine_regex =   re.compile(r"^[ \t]*UNDEFINE:", re.IGNORECASE)
-import_regex =     re.compile(r"^[ \t]*IMPORT:", re.IGNORECASE)
-comment_regex =    re.compile(r"^[ \t]*#")
-skipnewline_regex =re.compile(r"\\[ \t]*$")
-line_var_regex =   re.compile(r"\$line\b", re.IGNORECASE)
+tag_regex =         re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:)[\t]*)+", re.IGNORECASE)
+init_tag_regex =    re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*INIT:", re.IGNORECASE)
+cond_tag_regex =    re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*COND:", re.IGNORECASE)
+repeat_tag_regex =  re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*REPEAT:", re.IGNORECASE)
+block_tag_regex =   re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*BLOCK:[ \t]*(minecraft:)?[a-z_](:\d{1,2})?", re.IGNORECASE)
+block_regex =       re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*BLOCK:[ \t]*", re.IGNORECASE)
+define_regex =      re.compile(r"^[ \t]*DEFINE:", re.IGNORECASE)
+word_regex =        re.compile(r"\w+") # this regex has had me laughing for a while, but i need it
+param_regex =       re.compile(r"\((\w+,)*\w+\)")
+macro_regex =       re.compile(r"\w+\((\w+,)*\w+\)")
+undefine_regex =    re.compile(r"^[ \t]*UNDEFINE:", re.IGNORECASE)
+import_regex =      re.compile(r"^[ \t]*IMPORT:", re.IGNORECASE)
+comment_regex =     re.compile(r"^[ \t]*#")
+skipnewline_regex = re.compile(r"\\[ \t]*$")
+line_var_regex =    re.compile(r"\$line\b", re.IGNORECASE)
 
 def preprocess(commands, context = None, filename = None):
 	currtime = time.localtime()
@@ -225,20 +225,20 @@ def preprocess(commands, context = None, filename = None):
 		"e": CmdVariable("e", repr(math.e))
 	}
 	functions = {
-		"sin": CmdMacro("sin", [], "", sin),
-		"cos": CmdMacro("cos", [], "", cos),
-		"tan": CmdMacro("tan", [], "", tan),
-		"sinr": CmdMacro("sinr", [], "", sinr),
-		"cosr": CmdMacro("cosr", [], "", cosr),
-		"tanr": CmdMacro("tanr", [], "", tanr),
+		"sin":   CmdMacro("sin",   [], "", sin),
+		"cos":   CmdMacro("cos",   [], "", cos),
+		"tan":   CmdMacro("tan",   [], "", tan),
+		"sinr":  CmdMacro("sinr",  [], "", sinr),
+		"cosr":  CmdMacro("cosr",  [], "", cosr),
+		"tanr":  CmdMacro("tanr",  [], "", tanr),
 		"floor": CmdMacro("floor", [], "", floor),
-		"ceil": CmdMacro("ceil", [], "", ceil),
+		"ceil":  CmdMacro("ceil",  [], "", ceil),
 		"round": CmdMacro("round", [], "", rnd_l),
-		"add": CmdMacro("add", [], "", add),
-		"sub": CmdMacro("sub", [], "", sub),
-		"mul": CmdMacro("mul", [], "", mul),
-		"div": CmdMacro("div", [], "", div),
-		"pow": CmdMacro("pow", [], "", pow_l)
+		"add":   CmdMacro("add",   [], "", add),
+		"sub":   CmdMacro("sub",   [], "", sub),
+		"mul":   CmdMacro("mul",   [], "", mul),
+		"div":   CmdMacro("div",   [], "", div),
+		"pow":   CmdMacro("pow",   [], "", pow_l)
 	}
 	func_regex = re.compile("\\$("+"|".join(map(lambda x: functions[x].name, functions))+")"+CmdMacro.param, re.IGNORECASE)
 	outcommands = []
