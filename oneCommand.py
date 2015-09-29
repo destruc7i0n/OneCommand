@@ -53,6 +53,49 @@ class CmdVariable:
 	def sub(self, string):
 		return self.regex.sub(self.replacewith, string)
 
+def macrofunc(string, params, args):
+	for i in range(min(len(args), len(params))):
+		string = re.sub(r"\b" + params[i] + r"\b", args[i], string)
+	return string
+
+class CmdMacro:
+	param = r"\(((\d+|\"([^\"\\]*(\\.)*)*\"),\s*?)*(\d+|\"([^\"\\]*(\\.)*)*\")\)"
+	param_regex = re.compile(param)
+	def __init__(self, name, params, replacewith, function=macrofunc):
+		self.name = name
+		self.replacewith = replacewith
+		self.params = params
+		self.regex = re.compile(r"\$"+name.lower()+self.param, re.IGNORECASE)
+		self.function = function
+	def sub(self, string):
+		# print(string)
+		# print(self.regex.search(string))
+		# print(self.name)
+		while self.regex.search(string):
+			found = self.regex.finditer(string)
+			for find in found:
+				params = self.param_regex.search(find.group()).group()[1:-1]
+				params = re.sub(r",\s", ",", params)
+				params = params.split(",")
+				parsedparams = []
+				for i in params:
+					if i[0] == '"':
+						i = i[1:-1].replace('\\"', '"').replace('\\\\', '\\')
+					parsedparams.append(i)
+				output = self.function(self.replacewith, self.params, parsedparams)
+				string = string.replace(find.group(), output)
+		return string
+
+import math
+sin = lambda string, params, args: str(math.sin(math.radians(float(args[0]))))
+cos = lambda string, params, args: str(math.sin(math.radians(float(args[0]))))
+tan = lambda string, params, args: str(math.sin(math.radians(float(args[0]))))
+add = lambda string, params, args: str(float(args[0]) + float(args[1]))
+sub = lambda string, params, args: str(float(args[0]) - float(args[1]))
+mul = lambda string, params, args: str(float(args[0]) * float(args[1]))
+div = lambda string, params, args: str(float(args[0]) / float(args[1]))
+pow_l=lambda string, params, args: str(float(args[0]) **float(args[1]))
+
 
 def generate_sand(command_obj, direction):
 	if isinstance(command_obj, FakeCommand):
@@ -150,10 +193,13 @@ repeat_tag_regex = re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*REPE
 block_tag_regex =  re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*BLOCK:[ \t]*(minecraft:)?[a-z_](:\d{1,2})?", re.IGNORECASE)
 block_regex =      re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*BLOCK:[ \t]*", re.IGNORECASE)
 define_regex =     re.compile(r"^[ \t]*DEFINE:", re.IGNORECASE)
+word_regex =       re.compile(r"\w+") # this regex has had me laughing for a while, but i need it
+param_regex =      re.compile(r"\((\w+,)*\w+\)")
+macro_regex =      re.compile(r"\w+\((\w+,)*\w+\)")
 undefine_regex =   re.compile(r"^[ \t]*UNDEFINE:", re.IGNORECASE)
 import_regex =     re.compile(r"^[ \t]*IMPORT:", re.IGNORECASE)
-comment_regex =    re.compile(r"^[ \t]*#", re.IGNORECASE)
-skipnewline_regex =  re.compile(r"\\[ \t]*$", re.IGNORECASE)
+comment_regex =    re.compile(r"^[ \t]*#")
+skipnewline_regex =re.compile(r"\\[ \t]*$")
 
 def preprocess(commands, context = None, filename = None):
 	currtime = time.localtime()
@@ -170,14 +216,22 @@ def preprocess(commands, context = None, filename = None):
 			second = currtime.tm_sec
 		))
 	}
-
-
+	functions = {
+		"sin": CmdMacro("sin", [], "", sin),
+		"cos": CmdMacro("cos", [], "", cos),
+		"tan": CmdMacro("tan", [], "", tan),
+		"add": CmdMacro("add", [], "", add),
+		"sub": CmdMacro("sub", [], "", sub),
+		"mul": CmdMacro("mul", [], "", mul),
+		"div": CmdMacro("div", [], "", div),
+		"pow": CmdMacro("pow", [], "", pow_l)
+	}
+	func_regex = re.compile("\\$("+"|".join(map(lambda x: functions[x].name, functions))+")"+CmdMacro.param, re.IGNORECASE)
 	outcommands = []
-
 	compactedcommands = []
 	cindex = 0
 	while cindex < len(commands):
-		command = commands[cindex]
+		command = re.sub(r"\$line\b", str(cindex), commands[cindex], 0, re.IGNORECASE)
 		if skipnewline_regex.search(command):
 			new_command = skipnewline_regex.sub("", command)
 			next_command = "\\"
@@ -189,6 +243,8 @@ def preprocess(commands, context = None, filename = None):
 					next_command = ""
 				new_command += next_command.strip()
 			compactedcommands.append(new_command)
+		else:
+			compactedcommands.append(command)
 		cindex += 1
 
 
@@ -198,23 +254,35 @@ def preprocess(commands, context = None, filename = None):
 
 		for var in variables:
 			command = variables[var].sub(command)
+		while func_regex.search(command):
+			for macro in functions:
+				command = functions[macro].sub(command)
 
 		if define_regex.match(command):
 			command_split = define_regex.sub("", command).split()
-			while not command_split[0]: command_split = command_split[1:]
-			while not command_split[1]: command_split = command_split[:1] + command_split[2:]
 			if len(command_split) < 2: continue
 
 			name = command_split[0]
+
 			contents = " ".join(command_split[1:])
 
-			variables[name] = CmdVariable(name, contents)
+			if macro_regex.match(name):
+				params = param_regex.search(name).group()[1:-1].split(",")
+				name = word_regex.search(name).group()
+				functions[name] = CmdMacro(name, params, contents)
+				func_regex = re.compile("\\$("+"|".join(map(lambda x: functions[x].name, functions))+")"+CmdMacro.param, re.IGNORECASE)
+				continue
+
+			if word_regex.match(name):
+				variables[name] = CmdVariable(name, contents)
 
 		elif undefine_regex.match(command):
 			variables_to_remove = undefine_regex.sub("", command).strip().split()
 			for var in variables_to_remove:
 				if var in variables:
 					del variables[var]
+				if var in functions:
+					del functions[var]
 
 		elif import_regex.match(command):
 			if context is None: continue
@@ -379,9 +447,7 @@ if __name__ == "__main__":
 		else:
 			raise IOError(format("File {file} not found.", file=args.filepath))
 
-
 	init_commands, clock_commands = parse_commands(commands, context, filename)
-
 
 	final_command = gen_stack(init_commands, clock_commands, mode, args.loud)
 	
