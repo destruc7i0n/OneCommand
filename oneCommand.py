@@ -204,6 +204,7 @@ undefine_regex =   re.compile(r"^[ \t]*UNDEFINE:", re.IGNORECASE)
 import_regex =     re.compile(r"^[ \t]*IMPORT:", re.IGNORECASE)
 comment_regex =    re.compile(r"^[ \t]*#")
 skipnewline_regex =re.compile(r"\\[ \t]*$")
+line_var_regex =   re.compile(r"\$line\b", re.IGNORECASE)
 
 def preprocess(commands, context = None, filename = None):
 	currtime = time.localtime()
@@ -243,14 +244,14 @@ def preprocess(commands, context = None, filename = None):
 	compactedcommands = []
 	cindex = 0
 	while cindex < len(commands):
-		command = re.sub(r"\$line\b", str(cindex), commands[cindex], 0, re.IGNORECASE)
+		command = line_var_regex.sub(str(cindex), commands[cindex])
 		if skipnewline_regex.search(command):
 			new_command = skipnewline_regex.sub("", command)
 			next_command = "\\"
 			while skipnewline_regex.search(next_command):
 				if cindex != len(commands)-1:
 					cindex += 1
-					next_command = commands[cindex]
+					next_command = line_var_regex.sub(str(cindex), commands[cindex])
 				else:
 					next_command = ""
 				new_command += next_command.strip()
