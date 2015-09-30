@@ -51,7 +51,7 @@ Prepend your command with `COND:` to make it a conditional command.""")
 
 def high(*args):
 	e1.highlight_pattern(r"^\s*#.*$","grey",regexp=True)
-	e1.highlight_pattern(r"^\s*-","grey",regexp=True)
+	e1.highlight_pattern(r"\\\s*$","grey",regexp=True)
 	e1.highlight_pattern(r"\$\w+","light_blue",regexp=True)
 	e1.highlight_pattern(r"COND:","light_red",regexp=True)
 	e1.highlight_pattern(r"INIT:","light_green",regexp=True)
