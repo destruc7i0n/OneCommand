@@ -353,29 +353,33 @@ def parse_commands(commands, context = None, filename = None):
 
 	# do all INIT and COND checking
 	for command in commands:
-		init = False
-		conditional = False
-		block = "chain_command_block"
-		if cond_tag_regex.match(command): conditional = True
-		if init_tag_regex.match(command): init = True
-		if repeat_tag_regex.match(command): block = "repeating_command_block"
-		if block_tag_regex.match(command):
-			block = block_regex.sub("", command).strip()
+
+		subcommands = command.split("|\\n|")
+		for subcommand in subcommands:
+			subcommand = subcommand.strip()
+			init = False
+			conditional = False
+			block = "chain_command_block"
+			if cond_tag_regex.match(subcommand): conditional = True
+			if init_tag_regex.match(subcommand): init = True
+			if repeat_tag_regex.match(subcommand): block = "repeating_command_block"
+			if block_tag_regex.match(subcommand):
+				block = block_regex.sub("", subcommand).strip()
+				if init:
+					init_commands.append(FakeCommand(block, init))
+				else:
+					clock_commands.append(FakeCommand(block, init))
+				continue
+
+			command = tag_regex.sub("", subcommand).strip()
+			if not subcommand: continue
+
+			command_obj = Command(subcommand, block=block, conditional=conditional, init=init)
+			
 			if init:
-				init_commands.append(FakeCommand(block, init))
+				init_commands.append(command_obj)
 			else:
-				clock_commands.append(FakeCommand(block, init))
-			continue
-
-		command = tag_regex.sub("", command).strip()
-		if not command: continue
-
-		command_obj = Command(command, block=block, conditional=conditional, init=init)
-		
-		if init:
-			init_commands.append(command_obj)
-		else:
-			clock_commands.append(command_obj)
+				clock_commands.append(command_obj)
 	return init_commands, clock_commands
 
 def ride(entities, have_id=True):
