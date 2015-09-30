@@ -225,7 +225,13 @@ def preprocess(commands, context = None, filename = None):
 			second = currtime.tm_sec
 		)),
 		"pi": CmdVariable("pi", repr(math.pi)),
-		"e": CmdVariable("e", repr(math.e))
+		"e": CmdVariable("e", repr(math.e)),
+		"max_int": CmdVariable("max_int", "2147483647"),
+		"min_int": CmdVariable("min_int", "-2147483648"),
+		"max_short": CmdVariable("max_short", "32767"),
+		"min_short": CmdVariable("min_short", "-32768"),
+		"max_byte": CmdVariable("max_byte", "127"),
+		"min_byte": CmdVariable("min_byte", "-128")
 	}
 	functions = {
 		"sin":   CmdMacro("sin",   [], "", sin),
