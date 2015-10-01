@@ -191,7 +191,7 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 
 	return final_command
 
-tag_regex =         re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:)[\t]*)+", re.IGNORECASE)
+tag_regex =         re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:)[ \t]*)+", re.IGNORECASE)
 init_tag_regex =    re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*INIT:", re.IGNORECASE)
 cond_tag_regex =    re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*COND:", re.IGNORECASE)
 repeat_tag_regex =  re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*REPEAT:", re.IGNORECASE)
