@@ -361,7 +361,7 @@ def parse_commands(commands, context = None, filename = None):
 	# do all INIT and COND checking
 	for command in commands:
 
-		subcommands = command.split("|\\n|")
+		subcommands = command.split("\\;")
 		for subcommand in subcommands:
 			subcommand = subcommand.strip()
 			init = False
@@ -436,7 +436,7 @@ if __name__ == "__main__":
 	 {green}Prepend your command with `INIT:` to make it only run when the structure is deployed.{endc}
 	 {green}`BLOCK:minecraft:{name}:{data}` will summon a block (thereby stopping the current `REPEAT:` signal.){endc}
 	 {green}Prepend your command with `COND:` to make it a conditional command.{endc}
-	        Please report any bugs at the GitHub repo: {line}{blue}https://github.com/destruc7i0n/OneCommand/issues{endc}
+	        Please report any bugs at the GitHub repo: {line}{blue}https://github.com/destruc7i0n/OneCommand/issues{endc} {endc}
 	        {peach}----------------------------------------{endc}""", strip=True)
 
 	# get mode if not specified by argument
