@@ -377,7 +377,7 @@ def parse_commands(commands, context = None, filename = None):
 					clock_commands.append(FakeCommand(block, init))
 				continue
 
-			command = tag_regex.sub("", subcommand).strip()
+			subcommand = tag_regex.sub("", subcommand).strip()
 			if not subcommand: continue
 
 			command_obj = Command(subcommand, block=block, conditional=conditional, init=init)
