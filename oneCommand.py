@@ -87,11 +87,11 @@ class CmdMacro:
 		return string
 
 sin = lambda string, params, args: repr(math.sin(math.radians(float(args[0]))))
-cos = lambda string, params, args: repr(math.sin(math.radians(float(args[0]))))
-tan = lambda string, params, args: repr(math.sin(math.radians(float(args[0]))))
+cos = lambda string, params, args: repr(math.cos(math.radians(float(args[0]))))
+tan = lambda string, params, args: repr(math.tan(math.radians(float(args[0]))))
 sinr= lambda string, params, args: repr(math.sin(float(args[0])))
-cosr= lambda string, params, args: repr(math.sin(float(args[0])))
-tanr= lambda string, params, args: repr(math.sin(float(args[0])))
+cosr= lambda string, params, args: repr(math.cos(float(args[0])))
+tanr= lambda string, params, args: repr(math.tan(float(args[0])))
 floor=lambda string, params, args: repr(int(math.floor(float(args[0]))))
 ceil= lambda string, params, args: repr(int(math.ceil(float(args[0]))))
 rnd_l=lambda string, params, args: repr(round(float(args[0]), int(args[1])))
@@ -197,7 +197,8 @@ cond_tag_regex =    re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*CON
 repeat_tag_regex =  re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*REPEAT:", re.IGNORECASE)
 block_tag_regex =   re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*BLOCK:[ \t]*(minecraft:)?[a-z_](:\d{1,2})?", re.IGNORECASE)
 block_regex =       re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*BLOCK:[ \t]*", re.IGNORECASE)
-define_regex =      re.compile(r"^[ \t]*DEFINE:", re.IGNORECASE)
+define_regex =      re.compile(r"^[ \t]*DEFINE:\s*[a-zA-Z0-9_]+", re.IGNORECASE)
+define_tag_regex =  re.compile(r"^[ \t]*DEFINE:", re.IGNORECASE)
 word_regex =        re.compile(r"[a-zA-Z0-9_]+") # this regex has had me laughing for a while, but i need it
 param_regex =       re.compile(r"\(([a-zA-Z0-9_]+,)*[a-zA-Z0-9_]+\)")
 macro_regex =       re.compile(r"[a-zA-Z0-9_]+\(([a-zA-Z0-9_]+,)*[a-zA-Z0-9_]+\)")
@@ -282,7 +283,7 @@ def preprocess(commands, context = None, filename = None):
 				command = functions[macro].sub(command)
 
 		if define_regex.match(command):
-			command_split = define_regex.sub("", command).split()
+			command_split = define_tag_regex.sub("", command).split()
 			if len(command_split) < 2: continue
 
 			name = command_split[0]
