@@ -54,6 +54,8 @@ def high(*args):
 	e1.highlight_pattern(r"\\\s*$","grey",regexp=True)
 	e1.highlight_pattern(r"\|\\n\|","grey",regexp=True)
 	e1.highlight_pattern(r"\$\w+","light_blue",regexp=True)
+	e1.highlight_pattern(r"^[ \t]*FOR[ \t]*\(-?\d+(?:\.\d+)?(?:,-?\d+(?:\.\d+)?){0,2}\):[ \t]*$","light_blue",regexp=True)
+	e1.highlight_pattern(r"^[ \t]*:ENDFOR[ \t]*$","light_blue",regexp=True)
 	e1.highlight_pattern(r"COND:","light_red",regexp=True)
 	e1.highlight_pattern(r"INIT:","light_green",regexp=True)
 	e1.highlight_pattern(r"^\s*DEFINE:\s*\w+","blue",regexp=True)
@@ -70,7 +72,7 @@ def high(*args):
 	e1.highlight_pattern(r"false|true","purple",regexp=True)
 	e1.highlight_pattern(r"minecraft:","light_red",regexp=True)
 	e1.highlight_pattern(r"[\w_]+=","orange",regexp=True)
-	e1.highlight_pattern(r"\|[\w_]\|","orange",regexp=True)
+	e1.highlight_pattern(r"\|[\w_]*\|","orange",regexp=True)
 
 def loadFile():
 	global lastpath

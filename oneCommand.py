@@ -86,20 +86,20 @@ class CmdMacro:
 				string = string.replace(find.group(), output)
 		return string
 
-sin = lambda string, params, args: repr(math.sin(math.radians(float(args[0]))))
-cos = lambda string, params, args: repr(math.cos(math.radians(float(args[0]))))
-tan = lambda string, params, args: repr(math.tan(math.radians(float(args[0]))))
-sinr= lambda string, params, args: repr(math.sin(float(args[0])))
-cosr= lambda string, params, args: repr(math.cos(float(args[0])))
-tanr= lambda string, params, args: repr(math.tan(float(args[0])))
-floor=lambda string, params, args: repr(int(math.floor(float(args[0]))))
-ceil= lambda string, params, args: repr(int(math.ceil(float(args[0]))))
-rnd_l=lambda string, params, args: repr(round(float(args[0]), int(args[1])))
-add = lambda string, params, args: repr(float(args[0]) + float(args[1]))
-sub = lambda string, params, args: repr(float(args[0]) - float(args[1]))
-mul = lambda string, params, args: repr(float(args[0]) * float(args[1]))
-div = lambda string, params, args: repr(float(args[0]) / float(args[1]))
-pow_l=lambda string, params, args: repr(float(args[0]) **float(args[1]))
+sin =  lambda string, params, args: repr(math.sin(math.radians(float(args[0]))))
+cos =  lambda string, params, args: repr(math.cos(math.radians(float(args[0]))))
+tan =  lambda string, params, args: repr(math.tan(math.radians(float(args[0]))))
+sinr=  lambda string, params, args: repr(math.sin(float(args[0])))
+cosr=  lambda string, params, args: repr(math.cos(float(args[0])))
+tanr=  lambda string, params, args: repr(math.tan(float(args[0])))
+floor= lambda string, params, args: repr(int(math.floor(float(args[0]))))
+ceil=  lambda string, params, args: repr(int(math.ceil(float(args[0]))))
+rnd_l= lambda string, params, args: repr(round(float(args[0]), int(args[1])))
+add =  lambda string, params, args: repr(float(args[0]) + float(args[1]))
+sub =  lambda string, params, args: repr(float(args[0]) - float(args[1]))
+mul =  lambda string, params, args: repr(float(args[0]) * float(args[1]))
+div =  lambda string, params, args: repr(float(args[0]) / float(args[1]))
+pow_l= lambda string, params, args: repr(float(args[0]) **float(args[1]))
 
 
 def generate_sand(command_obj, direction):
@@ -191,25 +191,31 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 
 	return final_command
 
-tag_regex =         re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:)[ \t]*)+", re.IGNORECASE)
-init_tag_regex =    re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*INIT:", re.IGNORECASE)
-cond_tag_regex =    re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*COND:", re.IGNORECASE)
-repeat_tag_regex =  re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*REPEAT:", re.IGNORECASE)
-block_tag_regex =   re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*BLOCK:[ \t]*(minecraft:)?[a-z_](:\d{1,2})?", re.IGNORECASE)
-block_regex =       re.compile(r"^[ \t]*((INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*BLOCK:[ \t]*", re.IGNORECASE)
+tag_regex =         re.compile(r"^[ \t]*(?:(?:INIT:|COND:|REPEAT:)[ \t]*)+", re.IGNORECASE)
+init_tag_regex =    re.compile(r"^[ \t]*(?:(?:INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*INIT:", re.IGNORECASE)
+cond_tag_regex =    re.compile(r"^[ \t]*(?:(?:INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*COND:", re.IGNORECASE)
+repeat_tag_regex =  re.compile(r"^[ \t]*(?:(?:INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*REPEAT:", re.IGNORECASE)
+block_tag_regex =   re.compile(r"^[ \t]*(?:(?:INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*BLOCK:[ \t]*(minecraft:)?[a-z_](:\d{1,2})?", re.IGNORECASE)
+block_regex =       re.compile(r"^[ \t]*(?:(?:INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*BLOCK:[ \t]*", re.IGNORECASE)
 define_regex =      re.compile(r"^[ \t]*DEFINE:\s*[a-zA-Z0-9_]+", re.IGNORECASE)
 define_tag_regex =  re.compile(r"^[ \t]*DEFINE:", re.IGNORECASE)
 word_regex =        re.compile(r"[a-zA-Z0-9_]+") # this regex has had me laughing for a while, but i need it
-param_regex =       re.compile(r"\(([a-zA-Z0-9_]+,)*[a-zA-Z0-9_]+\)")
-macro_regex =       re.compile(r"[a-zA-Z0-9_]+\(([a-zA-Z0-9_]+,)*[a-zA-Z0-9_]+\)")
+param_regex =       re.compile(r"\((?:[a-zA-Z0-9_]+,)*[a-zA-Z0-9_]+\)")
+macro_regex =       re.compile(r"[a-zA-Z0-9_]+\((?:[a-zA-Z0-9_]+,)*[a-zA-Z0-9_]+\)")
 undefine_regex =    re.compile(r"^[ \t]*UNDEFINE:", re.IGNORECASE)
 import_regex =      re.compile(r"^[ \t]*IMPORT:", re.IGNORECASE)
-for_regex =         re.compile(r"^[ \t]*FOR: \(\d+\.\.\.\d+\)", re.IGNORECASE)
-endfor_regex =      re.compile(r":ENDFOR[ \t]*$", re.IGNORECASE)
+for_regex =         re.compile(r"^[ \t]*FOR[ \t]*\(-?\d+(?:\.\d+)?(?:,-?\d+(?:\.\d+)?){0,2}\):[ \t]*$", re.IGNORECASE)
+for_tag_regex =     re.compile(r"^[ \t]*FOR", re.IGNORECASE)
+fornum_regex =      re.compile(r"\|\|")
+endfor_regex =      re.compile(r"^[ \t]*:ENDFOR[ \t]*$", re.IGNORECASE)
 
 comment_regex =     re.compile(r"^[ \t]*#")
 skipnewline_regex = re.compile(r"\\[ \t]*$")
 line_var_regex =    re.compile(r"\$line\b", re.IGNORECASE)
+
+lessthan =   lambda a, b: a < b
+greatthan =  lambda a, b: a > b
+alwaysfalse= lambda *args: False
 
 def preprocess(commands, context = None, filename = None):
 	currtime = time.localtime()
@@ -225,14 +231,14 @@ def preprocess(commands, context = None, filename = None):
 			minute = currtime.tm_min,
 			second = currtime.tm_sec
 		)),
-		"pi": CmdVariable("pi", repr(math.pi)),
-		"e": CmdVariable("e", repr(math.e)),
-		"max_int": CmdVariable("max_int", "2147483647"),
-		"min_int": CmdVariable("min_int", "-2147483648"),
+		"pi":        CmdVariable("pi",        repr(math.pi)),
+		"e":         CmdVariable("e",         repr(math.e)),
+		"max_int":   CmdVariable("max_int",   "2147483647"),
+		"min_int":   CmdVariable("min_int",   "-2147483648"),
 		"max_short": CmdVariable("max_short", "32767"),
 		"min_short": CmdVariable("min_short", "-32768"),
-		"max_byte": CmdVariable("max_byte", "127"),
-		"min_byte": CmdVariable("min_byte", "-128")
+		"max_byte":  CmdVariable("max_byte",  "127"),
+		"min_byte":  CmdVariable("min_byte",  "-128")
 	}
 	functions = {
 		"sin":   CmdMacro("sin",   [], "", sin),
@@ -271,8 +277,48 @@ def preprocess(commands, context = None, filename = None):
 			compactedcommands.append(command)
 		cindex += 1
 
+	commands = []
+	cindex = 0
+	while cindex < len(compactedcommands):
+		command = compactedcommands[cindex]
+		if for_regex.match(command):
+			string = for_tag_regex.sub("", for_regex.match(command).group()).strip()[1:-2]
+			arguments = string.split(",")
+			if len(arguments) == 1:
+				start, stop, step = 0.0, float(arguments[0]), 1.0
+				if not stop % 1:
+					start, stop, step = int(start), int(stop), int(step)
+			elif len(arguments) == 2:
+				start, stop, step = float(arguments[0]), float(arguments[1]), 1.0
+				if not start % 1 and not stop % 1:
+					start, stop, step = int(start), int(stop), int(step)
+			else:
+				start, stop, step = float(arguments[0]), float(arguments[1]), float(arguments[2])
+				if not start % 1 and not stop % 1 and not step % 1:
+					start, stop, step = int(start), int(stop), int(step)
+			repeatcomms = []
+			next_command = ""
+			while cindex != len(commands)-1 and not endfor_regex.search(compactedcommands[cindex+1]):
+				cindex += 1
+				next_command = compactedcommands[cindex]
+				if next_command: 
+					repeatcomms.append(next_command)
+			cindex += 1
+			if step:
+				if step > 0:
+					i, end, func = min(start, stop), max(start, stop), lessthan
+				elif step < 0:
+					i, end, func = max(start, stop), min(start, stop), greatthan
+				while func(i, end):
+					for cmd in repeatcomms:
+						commands.append(fornum_regex.sub(str(i), cmd))
+					i += step
+		else:
+			commands.append(command)
+		cindex += 1
 
-	for command in compactedcommands:
+
+	for command in commands:
 		command = command.strip()
 		if not command or comment_regex.match(command): continue
 
@@ -457,11 +503,13 @@ if __name__ == "__main__":
 		filename = None
 		context = os.path.curdir
 		x = 1
-		command = cinput("Command {num}: ", num=x).strip()
-		while command:
-			x += 1
-			commands.append(command)
+		try:
 			command = cinput("Command {num}: ", num=x).strip()
+			while command:
+				x += 1
+				commands.append(command)
+				command = cinput("Command {num}: ", num=x).strip()
+		except (KeyboardInterrupt, EOFError): print(); quit()
 	# get commands from specified file
 	else:
 		if args.filepath == "stdin":
