@@ -60,7 +60,8 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 		if filloffset: filloffset += 1
 
 		if filloffset:
-			cprint("minecraft:command_block:0\n  - Initialization", color=bcolors.DARKGRAY, allow_repeat=True)
+			if loud:
+				cprint("minecraft:command_block:0\n  - Initialization", color=bcolors.DARKGRAY, allow_repeat=True)
 			sand = normal_sand("command_block")
 			if mode == 'i':
 				sand["TileEntityData"] = {
@@ -84,7 +85,7 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 			fill = Command(format("fill ~ ~-1 ~ ~ ~{offset} ~ air", offset = filloffset), init=True)
 			if loud:
 				cprint(fill.prettystr(), allow_repeat=True)
-			cprint("minecraft:barrier\n  - Initialization", color=bcolors.DARKGRAY, allow_repeat=True)
+				cprint("minecraft:barrier\n  - Initialization", color=bcolors.DARKGRAY, allow_repeat=True)
 			command_sands.append(generate_sand(fill, 0))
 			command_sands.append(normal_sand("barrier"))
 
