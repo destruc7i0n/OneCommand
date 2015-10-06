@@ -65,47 +65,7 @@ def preprocess(commands, context = None, filename = None):
 		cindex += 1
 
 	commands = []
-	cindex = 0
-	while cindex < len(compactedcommands):
-		command = compactedcommands[cindex]
-		if for_regex.match(command):
-			string = for_tag_regex.sub("", for_regex.match(command).group()).strip()[1:-2]
-			arguments = string.split(",")
-			if len(arguments) == 1:
-				start, stop, step = 0.0, float(arguments[0]), 1.0
-				if not stop % 1:
-					start, stop, step = int(start), int(stop), int(step)
-			elif len(arguments) == 2:
-				start, stop, step = float(arguments[0]), float(arguments[1]), 1.0
-				if not start % 1 and not stop % 1:
-					start, stop, step = int(start), int(stop), int(step)
-			else:
-				start, stop, step = float(arguments[0]), float(arguments[1]), float(arguments[2])
-				if not start % 1 and not stop % 1 and not step % 1:
-					start, stop, step = int(start), int(stop), int(step)
-			repeatcomms = []
-			next_command = ""
-			while cindex != len(commands)-1 and not endfor_regex.search(compactedcommands[cindex+1]):
-				cindex += 1
-				next_command = compactedcommands[cindex]
-				if next_command: 
-					repeatcomms.append(next_command)
-			cindex += 1
-			if step:
-				if step > 0:
-					i, end, func = min(start, stop), max(start, stop), lessthan
-				elif step < 0:
-					i, end, func = max(start, stop), min(start, stop), greatthan
-				while func(i, end):
-					for cmd in repeatcomms:
-						commands.append(fornum_regex.sub(str(i), cmd))
-					i += step
-		else:
-			commands.append(command)
-		cindex += 1
-
-
-	for command in commands:
+	for command in compactedcommands:
 		command = command.strip()
 		if not command or comment_regex.match(command): continue
 
@@ -176,9 +136,50 @@ def preprocess(commands, context = None, filename = None):
 					cprint("Failed to import {lib}. File not found.", color=bcolors.RED, lib=libraryname)
 					continue
 
-			outcommands += preprocess(lib.read().split("\n"), importedcontext, importedname)
+			commands += preprocess(lib.read().split("\n"), importedcontext, importedname)
+		else:
+			commands.append(command)
+
+	cindex = 0
+	while cindex < len(commands):
+		command = commands[cindex]
+		if for_regex.match(command):
+			string = for_tag_regex.sub("", for_regex.match(command).group()).strip()[1:-2]
+			arguments = string.split(",")
+
+			if len(arguments) == 1:
+				start, stop, step = 0.0, float(arguments[0]), 1.0
+				if not stop % 1:
+					start, stop, step = int(start), int(stop), int(step)
+			elif len(arguments) == 2:
+				start, stop, step = float(arguments[0]), float(arguments[1]), 1.0
+				if not start % 1 and not stop % 1:
+					start, stop, step = int(start), int(stop), int(step)
+			else:
+				start, stop, step = float(arguments[0]), float(arguments[1]), float(arguments[2])
+				if not start % 1 and not stop % 1 and not step % 1:
+					start, stop, step = int(start), int(stop), int(step)
+					
+			repeatcomms = []
+			next_command = ""
+			while cindex != len(commands)-1 and not endfor_regex.search(commands[cindex+1]):
+				cindex += 1
+				next_command = commands[cindex]
+				if next_command: 
+					repeatcomms.append(next_command)
+			cindex += 1
+			if step:
+				if step > 0:
+					i, end, func = min(start, stop), max(start, stop), lessthan
+				elif step < 0:
+					i, end, func = max(start, stop), min(start, stop), greatthan
+				while func(i, end):
+					for cmd in repeatcomms:
+						outcommands.append(fornum_regex.sub(str(i), cmd))
+					i += step
 		else:
 			outcommands.append(command)
+		cindex += 1
 	return outcommands
 
 
