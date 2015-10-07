@@ -11,11 +11,9 @@ define_tag_regex =  re.compile(r"^[ \t]*DEFINE:", re.IGNORECASE)
 word_regex =        re.compile(r"[a-zA-Z0-9_]+") # this regex has had me laughing for a while, but i need it
 param_regex =       re.compile(r"\((?:[a-zA-Z0-9_]+,)*[a-zA-Z0-9_]+\)")
 macro_regex =       re.compile(r"[a-zA-Z0-9_]+\((?:[a-zA-Z0-9_]+,)*[a-zA-Z0-9_]+\)")
-undefine_regex =    re.compile(r"^[ \t]*UNDEFINE:", re.IGNORECASE)
 import_regex =      re.compile(r"^[ \t]*IMPORT:", re.IGNORECASE)
-for_regex =         re.compile(r"^[ \t]*FOR[ \t]*\(-?\d+(?:\.\d+)?(?:,-?\d+(?:\.\d+)?){0,2}\):[ \t]*$", re.IGNORECASE)
+for_regex =         re.compile(r"^[ \t]*FOR[ \t]*\((?:[a-zA-Z0-9_]+;)?-?\d+(?:\.\d+)?(?:,-?\d+(?:\.\d+)?){0,2}\):[ \t]*$", re.IGNORECASE)
 for_tag_regex =     re.compile(r"^[ \t]*FOR", re.IGNORECASE)
-fornum_regex =      re.compile(r"\|\|")
 endfor_regex =      re.compile(r"^[ \t]*:ENDFOR[ \t]*$", re.IGNORECASE)
 
 comment_regex =     re.compile(r"^[ \t]*#")

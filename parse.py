@@ -4,6 +4,55 @@ from sands import gen_stack
 from util import cprint, bcolors
 import time
 
+def parse_for(cindex, commands):
+	loopedcommands = []
+	command = commands[cindex]
+	string = for_tag_regex.sub("", for_regex.match(command).group()).strip()[1:-2]
+	arguments = string.split(",")
+
+	spl = arguments[0].split(";")
+	if len(spl) == 2:
+		repl = spl[0]
+		arguments[0] = spl[1]
+	else:
+		repl = ""
+
+	if len(arguments) == 1:
+		start, stop, step = 0.0, float(arguments[0]), 1.0
+		if not stop % 1:
+			start, stop, step = int(start), int(stop), int(step)
+	elif len(arguments) == 2:
+		start, stop, step = float(arguments[0]), float(arguments[1]), 1.0
+		if not start % 1 and not stop % 1:
+			start, stop, step = int(start), int(stop), int(step)
+	else:
+		start, stop, step = float(arguments[0]), float(arguments[1]), float(arguments[2])
+		if not start % 1 and not stop % 1 and not step % 1:
+			start, stop, step = int(start), int(stop), int(step)
+			
+	repeatcomms = []
+	next_command = ""
+	while cindex != len(commands)-1 and not endfor_regex.search(commands[cindex+1]):
+		cindex += 1
+		next_command = commands[cindex]
+		if for_regex.match(next_command):
+			out, cindex = parse_for(cindex, commands)
+			repeatcomms += out
+		elif next_command: 
+			repeatcomms.append(next_command)
+
+	cindex += 1
+	if step:
+		if step > 0:
+			i, end, func = min(start, stop), max(start, stop), lessthan
+		elif step < 0:
+			i, end, func = max(start, stop), min(start, stop), greatthan
+		while func(i, end):
+			for cmd in repeatcomms:
+				loopedcommands.append(re.sub(r"\|"+repl+r"\|", str(i), cmd, 0, re.IGNORECASE))
+			i += step
+	return loopedcommands, cindex
+
 def preprocess(commands, context = None, filename = None):
 	currtime = time.localtime()
 	variables = {
@@ -86,20 +135,18 @@ def preprocess(commands, context = None, filename = None):
 			if macro_regex.match(name):
 				params = param_regex.search(name).group()[1:-1].split(",")
 				name = word_regex.search(name).group()
-				functions[name] = CmdMacro(name, params, contents)
-				func_regex = re.compile("\\$("+"|".join(map(lambda x: functions[x].name, functions))+")"+CmdMacro.param, re.IGNORECASE)
+				if name not in functions:
+					functions[name] = CmdMacro(name, params, contents)
+					func_regex = re.compile("\\$("+"|".join(map(lambda x: functions[x].name, functions))+")"+CmdMacro.param, re.IGNORECASE)
+				else:
+					cprint("Can't define twice. Using first definition.")
 				continue
 
 			if word_regex.match(name):
-				variables[name] = CmdVariable(name, contents)
-
-		elif undefine_regex.match(command):
-			variables_to_remove = undefine_regex.sub("", command).strip().split()
-			for var in variables_to_remove:
-				if var in variables:
-					del variables[var]
-				if var in functions:
-					del functions[var]
+				if name not in variables:
+					variables[name] = CmdVariable(name, contents)
+				else:
+					cprint("Can't define twice. Using first definition.")
 
 		elif import_regex.match(command):
 			if context is None: continue
@@ -140,46 +187,25 @@ def preprocess(commands, context = None, filename = None):
 		else:
 			commands.append(command)
 
+	loopedcommands = []
 	cindex = 0
 	while cindex < len(commands):
 		command = commands[cindex]
 		if for_regex.match(command):
-			string = for_tag_regex.sub("", for_regex.match(command).group()).strip()[1:-2]
-			arguments = string.split(",")
-
-			if len(arguments) == 1:
-				start, stop, step = 0.0, float(arguments[0]), 1.0
-				if not stop % 1:
-					start, stop, step = int(start), int(stop), int(step)
-			elif len(arguments) == 2:
-				start, stop, step = float(arguments[0]), float(arguments[1]), 1.0
-				if not start % 1 and not stop % 1:
-					start, stop, step = int(start), int(stop), int(step)
-			else:
-				start, stop, step = float(arguments[0]), float(arguments[1]), float(arguments[2])
-				if not start % 1 and not stop % 1 and not step % 1:
-					start, stop, step = int(start), int(stop), int(step)
-					
-			repeatcomms = []
-			next_command = ""
-			while cindex != len(commands)-1 and not endfor_regex.search(commands[cindex+1]):
-				cindex += 1
-				next_command = commands[cindex]
-				if next_command: 
-					repeatcomms.append(next_command)
-			cindex += 1
-			if step:
-				if step > 0:
-					i, end, func = min(start, stop), max(start, stop), lessthan
-				elif step < 0:
-					i, end, func = max(start, stop), min(start, stop), greatthan
-				while func(i, end):
-					for cmd in repeatcomms:
-						outcommands.append(fornum_regex.sub(str(i), cmd))
-					i += step
+			out, cindex = parse_for(cindex, commands)
+			loopedcommands += out
 		else:
-			outcommands.append(command)
+			loopedcommands.append(command)
 		cindex += 1
+
+	for command in loopedcommands:
+		for var in variables:
+			command = variables[var].sub(command)
+		while func_regex.search(command):
+			for macro in functions:
+				command = functions[macro].sub(command)
+		if command:
+			outcommands.append(command)
 	return outcommands
 
 

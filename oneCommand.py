@@ -35,7 +35,6 @@ if __name__ == "__main__":
 	 {green}Prepend your command with `#` to comment it out.{endc}
 	 {green}Prepend your command with `DEFINE:` to make it a variable definition.{endc}
 	        Example: `DEFINE:world hello` and `say $world` would say `hello`.
-	 {green}Prepend your command with `UNDEFINE:` to make it a variable undefiner.{endc}
 	 {green}Prepend your command with `REPEAT:` to make it a repeating command block.{endc}
 	 {green}Prepend your command with `INIT:` to make it only run when the structure is deployed.{endc}
 	 {green}`BLOCK:minecraft:{name}:{data}` will summon a block (thereby stopping the current `REPEAT:` signal.){endc}
