@@ -3,17 +3,9 @@ from util import cprint, format, bcolors
 import nbtencoder as nbt
 
 def ride(entities, have_id=True):
-	topmost = None
-	absoluteTopmost = None
-	
-	for entity in entities:
-		if topmost == None:
-			absoluteTopmost = entity
-		else:
-			topmost["Riding"] = entity
-		topmost = entity
-	if not have_id: del absoluteTopmost["id"]
-	return absoluteTopmost
+	bottom = entities[-1]
+	bottom["Passengers"] = entities[:-1]
+	return bottom
 
 def generate_sand(command_obj, direction):
 	if isinstance(command_obj, FakeCommand):
