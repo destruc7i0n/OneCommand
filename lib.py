@@ -8,6 +8,7 @@ block_tag_regex =   re.compile(r"^[ \t]*(?:(?:INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)
 block_regex =       re.compile(r"^[ \t]*(?:(?:INIT:|COND:|REPEAT:|BLOCK:)[ \t]*)*BLOCK:[ \t]*", re.IGNORECASE)
 define_regex =      re.compile(r"^[ \t]*DEFINE:\s*[a-zA-Z0-9_]+", re.IGNORECASE)
 define_tag_regex =  re.compile(r"^[ \t]*DEFINE:", re.IGNORECASE)
+undefine_regex =    re.compile(r"^[ \t]*UNDEFINE:", re.IGNORECASE)
 word_regex =        re.compile(r"[a-zA-Z0-9_]+") # this regex has had me laughing for a while, but i need it
 param_regex =       re.compile(r"\((?:[a-zA-Z0-9_]+,)*[a-zA-Z0-9_]+\)")
 macro_regex =       re.compile(r"[a-zA-Z0-9_]+\((?:[a-zA-Z0-9_]+,)*[a-zA-Z0-9_]+\)")

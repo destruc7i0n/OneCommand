@@ -4,7 +4,7 @@ from sands import gen_stack
 from util import cprint, bcolors
 import time
 
-def parse_for(cindex, commands):
+def parse_for(cindex, commands, functions, variables, func_regex):
 	loopedcommands = []
 	command = commands[cindex]
 	string = for_tag_regex.sub("", for_regex.match(command).group()).strip()[1:-2]
@@ -32,11 +32,11 @@ def parse_for(cindex, commands):
 			
 	repeatcomms = []
 	next_command = ""
-	while cindex != len(commands)-1 and not endfor_regex.search(commands[cindex+1]):
+	while cindex < len(commands)-1 and not endfor_regex.search(commands[cindex+1]):
 		cindex += 1
 		next_command = commands[cindex]
 		if for_regex.match(next_command):
-			out, cindex = parse_for(cindex, commands)
+			cindex, out, functions, variables, func_regex = parse_for(cindex, commands, functions, variables, func_regex)
 			repeatcomms += out
 		elif next_command: 
 			repeatcomms.append(next_command)
@@ -51,7 +51,94 @@ def parse_for(cindex, commands):
 			for cmd in repeatcomms:
 				loopedcommands.append(re.sub(r"\|"+repl+r"\|", str(i), cmd, 0, re.IGNORECASE))
 			i += step
-	return loopedcommands, cindex
+
+	outcommands = []
+	ccindex = 0
+	while ccindex < len(loopedcommands):
+		ccindex, out, functions, variables, func_regex = parse_cmd(ccindex, loopedcommands, functions, variables, func_regex)
+		outcommands += out
+		ccindex += 1
+	return cindex, outcommands, functions, variables, func_regex
+
+def parse_cmd(cindex, commands, functions, variables, func_regex):
+	outcommands = []
+	command = commands[cindex].strip()
+	if not command or comment_regex.match(command): return cindex, [], functions, variables, func_regex
+
+	for var in variables:
+		command = variables[var].sub(command)
+	while func_regex.search(command):
+		for macro in functions:
+			command = functions[macro].sub(command)
+
+	if define_regex.match(command):
+		command_split = define_tag_regex.sub("", command).split()
+		if len(command_split) < 2: return cindex, [], functions, variables, func_regex
+
+		name = command_split[0]
+
+		contents = " ".join(command_split[1:])
+
+		if macro_regex.match(name):
+			params = param_regex.search(name).group()[1:-1].split(",")
+			name = word_regex.search(name).group()
+			functions[name] = CmdMacro(name, params, contents)
+			func_regex = re.compile("\\$("+"|".join(map(lambda x: functions[x].name, functions))+")"+CmdMacro.param, re.IGNORECASE)
+			return cindex, [], functions, variables, func_regex
+
+		if word_regex.match(name):
+			variables[name] = CmdVariable(name, contents)
+
+	elif undefine_regex.match(command):
+		command_split = undefine_regex.sub("", command).split()
+		for i in command_split:
+			if i in variables:
+				del variables[i]
+			if i in functions:
+				del functions[i]
+
+	elif import_regex.match(command):
+		if context is None: return cindex, [], functions, variables, func_regex
+
+		libraryname = import_regex.sub("", command).strip()
+		if not libraryname: return cindex, [], functions, variables, func_regex
+
+		if isinstance(context, str):
+			if os.path.exists(os.path.join(context, libraryname)):
+				importedcontext = context
+				importedname = libraryname
+				lib = open(os.path.join(context,libraryname))
+			elif os.path.exists(os.path.join(context, libraryname+".1cc")):
+				importedcontext = context
+				importedname = libraryname+".1cc"
+				lib = open(os.path.join(context, libraryname+".1cc"))
+			else:
+				cprint("Failed to import {lib}. File not found.", color=bcolors.RED, lib=libraryname)
+				return []
+		else:
+			lib = None
+			for i in context:
+				if os.path.exists(os.path.join(i, libraryname)):
+					importedcontext = i
+					importedname = libraryname
+					lib = open(os.path.join(i,libraryname))
+					break
+				elif os.path.exists(os.path.join(i, libraryname+".1cc")):
+					importedcontext = i
+					importedname = libraryname+".1cc"
+					lib = open(os.path.join(i, libraryname+".1cc"))
+					break
+			if not lib:
+				cprint("Failed to import {lib}. File not found.", color=bcolors.RED, lib=libraryname)
+				return []
+
+		outcommands += preprocess(lib.read().split("\n"), importedcontext, importedname)
+	elif for_regex.match(command):
+		cindex, out, functions, variables, func_regex = parse_for(cindex, commands, functions, variables, func_regex)
+		outcommands += out
+	else:
+		outcommands.append(command)
+	return cindex, outcommands, functions, variables, func_regex
 
 def preprocess(commands, context = None, filename = None):
 	currtime = time.localtime()
@@ -102,7 +189,7 @@ def preprocess(commands, context = None, filename = None):
 			new_command = skipnewline_regex.sub("", command)
 			next_command = "\\"
 			while skipnewline_regex.search(next_command):
-				if cindex != len(commands)-1:
+				if cindex < len(commands)-1:
 					cindex += 1
 					next_command = line_var_regex.sub(str(cindex+1), commands[cindex])
 				else:
@@ -113,99 +200,14 @@ def preprocess(commands, context = None, filename = None):
 			compactedcommands.append(command)
 		cindex += 1
 
-	commands = []
-	for command in compactedcommands:
-		command = command.strip()
-		if not command or comment_regex.match(command): continue
-
-		for var in variables:
-			command = variables[var].sub(command)
-		while func_regex.search(command):
-			for macro in functions:
-				command = functions[macro].sub(command)
-
-		if define_regex.match(command):
-			command_split = define_tag_regex.sub("", command).split()
-			if len(command_split) < 2: continue
-
-			name = command_split[0]
-
-			contents = " ".join(command_split[1:])
-
-			if macro_regex.match(name):
-				params = param_regex.search(name).group()[1:-1].split(",")
-				name = word_regex.search(name).group()
-				if name not in functions:
-					functions[name] = CmdMacro(name, params, contents)
-					func_regex = re.compile("\\$("+"|".join(map(lambda x: functions[x].name, functions))+")"+CmdMacro.param, re.IGNORECASE)
-				else:
-					cprint("Can't define twice. Using first definition.")
-				continue
-
-			if word_regex.match(name):
-				if name not in variables:
-					variables[name] = CmdVariable(name, contents)
-				else:
-					cprint("Can't define twice. Using first definition.")
-
-		elif import_regex.match(command):
-			if context is None: continue
-
-			libraryname = import_regex.sub("", command).strip()
-			if not libraryname: continue
-
-			if isinstance(context, str):
-				if os.path.exists(os.path.join(context, libraryname)):
-					importedcontext = context
-					importedname = libraryname
-					lib = open(os.path.join(context,libraryname))
-				elif os.path.exists(os.path.join(context, libraryname+".1cc")):
-					importedcontext = context
-					importedname = libraryname+".1cc"
-					lib = open(os.path.join(context, libraryname+".1cc"))
-				else:
-					cprint("Failed to import {lib}. File not found.", color=bcolors.RED, lib=libraryname)
-					continue
-			else:
-				lib = None
-				for i in context:
-					if os.path.exists(os.path.join(i, libraryname)):
-						importedcontext = i
-						importedname = libraryname
-						lib = open(os.path.join(i,libraryname))
-						break
-					elif os.path.exists(os.path.join(i, libraryname+".1cc")):
-						importedcontext = i
-						importedname = libraryname+".1cc"
-						lib = open(os.path.join(i, libraryname+".1cc"))
-						break
-				if not lib:
-					cprint("Failed to import {lib}. File not found.", color=bcolors.RED, lib=libraryname)
-					continue
-
-			commands += preprocess(lib.read().split("\n"), importedcontext, importedname)
-		else:
-			commands.append(command)
-
-	loopedcommands = []
+	outcommands = []
 	cindex = 0
-	while cindex < len(commands):
-		command = commands[cindex]
-		if for_regex.match(command):
-			out, cindex = parse_for(cindex, commands)
-			loopedcommands += out
-		else:
-			loopedcommands.append(command)
+	while cindex < len(compactedcommands):
+		try:
+			cindex, out, functions, variables, func_regex = parse_cmd(cindex, commands, functions, variables, func_regex)
+		except:quit()
+		outcommands += out
 		cindex += 1
-
-	for command in loopedcommands:
-		for var in variables:
-			command = variables[var].sub(command)
-		while func_regex.search(command):
-			for macro in functions:
-				command = functions[macro].sub(command)
-		if command:
-			outcommands.append(command)
 	return outcommands
 
 
