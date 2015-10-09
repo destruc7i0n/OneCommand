@@ -203,9 +203,7 @@ def preprocess(commands, context = None, filename = None):
 	outcommands = []
 	cindex = 0
 	while cindex < len(compactedcommands):
-		try:
-			cindex, out, functions, variables, func_regex = parse_cmd(cindex, commands, functions, variables, func_regex)
-		except:quit()
+		cindex, out, functions, variables, func_regex = parse_cmd(cindex, compactedcommands, functions, variables, func_regex)
 		outcommands += out
 		cindex += 1
 	return outcommands
