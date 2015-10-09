@@ -41,6 +41,8 @@ def parse_for(cindex, commands, functions, variables, func_regex):
 		elif next_command: 
 			repeatcomms.append(next_command)
 
+	repl = re.compile(r"\|"+repl+r"\|", re.IGNORECASE)
+
 	cindex += 1
 	if step:
 		if step > 0:
@@ -49,16 +51,19 @@ def parse_for(cindex, commands, functions, variables, func_regex):
 			i, end, func = max(start, stop), min(start, stop), greatthan
 		while func(i, end):
 			for cmd in repeatcomms:
-				loopedcommands.append(re.sub(r"\|"+repl+r"\|", str(i), cmd, 0, re.IGNORECASE))
+				loopedcommands.append(repl.sub(str(i), cmd))
 			i += step
+	
+	return cindex, loopedcommands, functions, variables, func_regex
 
+def endparse_for(commands, functions, variables, func_regex):
 	outcommands = []
 	ccindex = 0
-	while ccindex < len(loopedcommands):
-		ccindex, out, functions, variables, func_regex = parse_cmd(ccindex, loopedcommands, functions, variables, func_regex)
+	while ccindex < len(commands):
+		ccindex, out, functions, variables, func_regex = parse_cmd(ccindex, commands, functions, variables, func_regex)
 		outcommands += out
 		ccindex += 1
-	return cindex, outcommands, functions, variables, func_regex
+	return outcommands
 
 def parse_cmd(cindex, commands, functions, variables, func_regex):
 	outcommands = []
@@ -135,7 +140,7 @@ def parse_cmd(cindex, commands, functions, variables, func_regex):
 		outcommands += preprocess(lib.read().split("\n"), importedcontext, importedname)
 	elif for_regex.match(command):
 		cindex, out, functions, variables, func_regex = parse_for(cindex, commands, functions, variables, func_regex)
-		outcommands += out
+		outcommands += endparse_for(out, functions, variables, func_regex)
 	else:
 		outcommands.append(command)
 	return cindex, outcommands, functions, variables, func_regex
