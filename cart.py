@@ -55,7 +55,7 @@ def gen_cart_stack(init_commands, clock_commands, mode, loud=False):
 		final_stack = sands.ride([
 			stack, 
 			sands.normal_sand("redstone_block"),
-			sands.normal_sand("barrier")
+			sands.normal_sand("stone")
 		], False)
 		final_command_obj = nbt.cmd("summon FallingSand ~ ~1 ~ ", final_stack)
 
