@@ -50,12 +50,21 @@ def gen_cart_stack(init_commands, clock_commands, mode, loud=False):
 				command.block = "repeating_command_block"
 			entities.append(cart_command_block(offset, command, 1, mode))
 			offset += 1
+		entities.append(cart_command_block(offset+1, Command("fill ~ ~ ~ ~ ~2 ~ air"), 0, mode))
+		entities.append(cart_command_block(offset+2, Command(format("fill ~ ~-{o1} ~ ~ ~-{o2} ~ air", o1=offset+2,o2=offset+4)), 0, mode))
+
+		activatesand = sands.normal_sand("command_block")
+		activatesand["TileEntityData"] = {
+			"auto": 1
+		}
+
+		entities.append(cart(nbt.cmd(format("summon FallingSand ~ ~{o} ~ ", o=offset+3), activatesand, True)))
 		entities.append(cart("kill @e[r=1,type=MinecartCommandBlock]"))
 		stack = ride(entities)
 		final_stack = sands.ride([
 			stack, 
 			sands.normal_sand("redstone_block"),
-			sands.normal_sand("stone")
+			sands.normal_sand("barrier")
 		], False)
 		final_command_obj = nbt.cmd("summon FallingSand ~ ~1 ~ ", final_stack)
 
