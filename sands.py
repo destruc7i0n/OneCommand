@@ -24,6 +24,7 @@ def generate_sand(command_obj, direction):
 			"Command": str(command_obj),
 			"TrackOutput": nbt.int_b(0)
 		},
+		"DropItem":0,
 		"Time": 1,
 		"id": nbt.noquote_str("FallingSand")
 	}
@@ -37,6 +38,7 @@ def normal_sand(block, data=0):
 	tag = {
 		"Block": nbt.noquote_str(block),
 		"Time": 1,
+		"DropItem":0,
 		"id": nbt.noquote_str("FallingSand")
 	}
 	if data:

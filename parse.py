@@ -1,5 +1,6 @@
 from lib import *
 from classes import *
+from cart import gen_cart_stack
 from sands import gen_stack
 from util import cprint, bcolors
 import time
@@ -56,13 +57,13 @@ def parse_for(cindex, commands, functions, variables, func_regex):
 	
 	return cindex, loopedcommands, functions, variables, func_regex
 
-def endparse_for(commands, functions, variables, func_regex):
+def parse_section(commands, functions, variables, func_regex):
 	outcommands = []
-	ccindex = 0
-	while ccindex < len(commands):
-		ccindex, out, functions, variables, func_regex = parse_cmd(ccindex, commands, functions, variables, func_regex)
+	cindex = 0
+	while cindex < len(commands):
+		cindex, out, functions, variables, func_regex = parse_cmd(cindex, commands, functions, variables, func_regex)
 		outcommands += out
-		ccindex += 1
+		cindex += 1
 	return outcommands
 
 def parse_cmd(cindex, commands, functions, variables, func_regex):
@@ -140,7 +141,7 @@ def parse_cmd(cindex, commands, functions, variables, func_regex):
 		outcommands += preprocess(lib.read().split("\n"), importedcontext, importedname)
 	elif for_regex.match(command):
 		cindex, out, functions, variables, func_regex = parse_for(cindex, commands, functions, variables, func_regex)
-		outcommands += endparse_for(out, functions, variables, func_regex)
+		outcommands += parse_section(out, functions, variables, func_regex)
 	else:
 		outcommands.append(command)
 	return cindex, outcommands, functions, variables, func_regex
@@ -205,13 +206,7 @@ def preprocess(commands, context = None, filename = None):
 			compactedcommands.append(command)
 		cindex += 1
 
-	outcommands = []
-	cindex = 0
-	while cindex < len(compactedcommands):
-		cindex, out, functions, variables, func_regex = parse_cmd(cindex, compactedcommands, functions, variables, func_regex)
-		outcommands += out
-		cindex += 1
-	return outcommands
+	return parse_section(compactedcommands, functions, variables, func_regex)
 
 
 def parse_commands(commands, context = None, filename = None):

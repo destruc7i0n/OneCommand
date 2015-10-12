@@ -31,7 +31,7 @@ def JSON2Command(json):
 		command += json.command + " "
 		command += JSON2Command(json.obj)
 		if json.as_string:
-			command.replace(r'"', r'\"')
+			command = command.replace('\\', '\\\\').replace(r'"', r'\"')
 			command = '"' + command + '"'
 
 	elif isinstance(json, dict):
