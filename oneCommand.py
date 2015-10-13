@@ -12,7 +12,7 @@ if __name__ == "__main__":
 	parser.add_argument("-m", "--mode", help="Choose activation mode for system", dest="mode", default="", choices=["m", "i"])
 	parser.add_argument("-f", "--command_file", help="File to load commands from", dest="filepath", nargs="?",
 		default=None, const="stdin")
-	parser.add_argument("-a", "--alternate-parser", help="Use the alternate Cart parser", dest="cart", action="store_true")
+	parser.add_argument("-a", "--alternate-parser", help="Use the old parser", dest="nocart", action="store_true")
 	parser.add_argument("-C", "--no-copy", help="Don't copy the output command", dest="nocopy", action="store_true")
 	parser.add_argument("-q", "--quiet", help="Silence output", dest="quiet", action="store_true")
 	parser.add_argument("-v", "--verbose", help="Detailed output", dest="loud", action="store_true")
@@ -84,10 +84,10 @@ if __name__ == "__main__":
 
 	init_commands, clock_commands = parse_commands(commands, context, filename)
 
-	if args.cart:
-		final_command = gen_cart_stack(init_commands, clock_commands, mode, args.loud)
-	else:
+	if args.nocart:
 		final_command = gen_stack(init_commands, clock_commands, mode, args.loud)
+	else:
+		final_command = gen_cart_stack(init_commands, clock_commands, mode, args.loud)
 	
 
 

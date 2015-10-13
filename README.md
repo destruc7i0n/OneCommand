@@ -12,7 +12,7 @@ A OneCommand syntax/generator has been written as a plugin for Sublime Text. You
 oneCommand.py has been designed from scratch with the CLI in mind. The arguments are as follows:
 * `-m {m,i}`, `--mode {m,i}`: Choose whether to have the contraption activated manually (`m`) or instantly, upon deployment (`i`).
 * `-f [FILE]`, `--command_file [FILE]`: Use a file as input. Without an argument, it will pull from `STDIN`.
-* `-a`, `--alternate-parser`: Use the alternate Cart parser.
+* `-a`, `--alternate-parser`: Use the old parser.
 * `-C`, `--no-copy`: By default, OneCommand will copy the output to the clipboard. This argument prevents that behavior.
 * `-q`, `--quiet`: Silences all output besides the command itself.
 * `-v`, `--verbose`: More detailed output.

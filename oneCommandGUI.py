@@ -1,4 +1,4 @@
-from oneCommand import gen_stack, parse_commands
+from oneCommand import gen_cart_stack, parse_commands
 
 from Tkinter import *
 import os, pyperclip
@@ -100,7 +100,7 @@ def lezDoThis():
 	if mode == "":
 		show("Cannot get mode")
 	init_commands, clock_commands = parse_commands(commands)
-	final_command = gen_stack(init_commands, clock_commands, mode, False)
+	final_command = gen_cart_stack(init_commands, clock_commands, mode, False)
 	out.configure(state=NORMAL)
 	out.delete(1.0, END)
 	if len(final_command) <= 32500 and final_command:
