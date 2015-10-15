@@ -54,15 +54,21 @@ def gen_cart_stack(init_commands, clock_commands, mode, loud=False):
 				cprint(command.prettystr())
 			entities.append(cart_command_block(offset, command, 1, mode))
 			offset += 1
-		entities.append(cart_command_block(offset+1, Command("fill ~ ~ ~ ~ ~4 ~ air")))
-		entities.append(cart_command_block(offset+2, Command(format("clone ~ ~-2 ~ ~ ~-{o1} ~ ~ ~-{o2} ~ replace move", o1=offset+1,o2=offset+4))))
-		entities.append(cart_command_block(offset+3, Command(format("fill ~ ~-{o1} ~ ~ ~-{o2} ~ air", o1=offset+3,o2=offset+5))))
 
+		filloffset = offset+1
+		offset += 2
+		entities.append(cart_command_block(offset, Command(format("clone ~ ~-2 ~ ~ ~-{o1} ~ ~ ~-{o2} ~ replace move", o1=offset-1,o2=offset+2))))
+		offset += 1
+		entities.append(cart_command_block(offset, Command(format("fill ~ ~-{o1} ~ ~ ~-{o2} ~ air", o1=offset,o2=offset+2))))
+
+		offset += 1
 		activatesand = sands.normal_sand("command_block")
 		activatesand["TileEntityData"] = {"auto": 1}
 
-		entities.append(cart_block(offset+5, "air"))
-		entities.append(cart(nbt.cmd(format("summon FallingSand ~ ~{o} ~ ", o=offset+5), activatesand, True)))
+		entities.append(cart_block(offset, "air"))
+		entities.append(cart(nbt.cmd(format("summon FallingSand ~ ~{o} ~ ", o=offset), activatesand, True)))
+
+		entities.append(cart_command_block(filloffset, Command(format("fill ~ ~ ~ ~ ~{o} ~ air", o=offset-filloffset))))
 		entities.append(cart("kill @e[r=1,type=MinecartCommandBlock]"))
 		stack = ride(entities)
 		final_stack = sands.ride([
