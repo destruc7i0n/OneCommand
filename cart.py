@@ -43,11 +43,15 @@ def gen_cart_stack(init_commands, clock_commands, mode, loud=False):
 		entities.append(sands.normal_sand("activator_rail"))
 		for command in init_commands:
 			if hasattr(command, "cmd"):
+				if loud:
+					cprint(command.prettystr())
 				entities.append(cart(command.cmd))
 		offset = 1
 		for command in clock_commands:
 			if offset == 1:
 				command.block = "repeating_command_block"
+			if loud:
+				cprint(command.prettystr())
 			entities.append(cart_command_block(offset, command, 1, mode))
 			offset += 1
 		entities.append(cart_command_block(offset+1, Command("fill ~ ~ ~ ~ ~4 ~ air")))
