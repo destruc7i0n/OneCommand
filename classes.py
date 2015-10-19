@@ -1,4 +1,4 @@
-from util import format, cprint
+from wireutils import format, color_print
 import re
 
 class Command:
@@ -74,7 +74,7 @@ class CmdMacro:
 				try:
 					output = self.function(self.replacewith, self.params, parsedparams)
 				except:
-					cprint("{params} is not a valid argument list for ${funcname}.", color=bcolors.RED, params=params, funcname=self.name)
+					color_print("{params} is not a valid argument list for ${funcname}.", color=ansi_colors.RED, params=params, funcname=self.name)
 					output = ""
 				string = string.replace(find.group(), output)
 		return string

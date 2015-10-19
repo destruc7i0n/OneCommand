@@ -2,7 +2,7 @@ from lib import *
 from classes import *
 from cart import gen_cart_stack
 from sands import gen_stack
-from util import cprint, bcolors
+from wireutils import color_print, ansi_colors
 import time
 
 def parse_for(cindex, commands, functions, variables, func_regex):
@@ -119,7 +119,7 @@ def parse_cmd(cindex, commands, functions, variables, func_regex):
 				importedname = libraryname+".1cc"
 				lib = open(os.path.join(context, libraryname+".1cc"))
 			else:
-				cprint("Failed to import {lib}. File not found.", color=bcolors.RED, lib=libraryname)
+				color_print("Failed to import {lib}. File not found.", color=ansi_colors.RED, lib=libraryname)
 				return []
 		else:
 			lib = None
@@ -135,7 +135,7 @@ def parse_cmd(cindex, commands, functions, variables, func_regex):
 					lib = open(os.path.join(i, libraryname+".1cc"))
 					break
 			if not lib:
-				cprint("Failed to import {lib}. File not found.", color=bcolors.RED, lib=libraryname)
+				color_print("Failed to import {lib}. File not found.", color=ansi_colors.RED, lib=libraryname)
 				return []
 
 		outcommands += preprocess(lib.read().split("\n"), importedcontext, importedname)

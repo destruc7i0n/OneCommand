@@ -1,5 +1,5 @@
 from classes import Command, FakeCommand
-from util import cprint, format, bcolors
+from wireutils import color_print, format, ansi_colors
 import nbtencoder as nbt
 
 def ride(entities, have_id=True):
@@ -63,7 +63,7 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 
 		if filloffset:
 			if loud:
-				cprint("minecraft:command_block:0\n  - Initialization", color=bcolors.DARKGRAY, allow_repeat=True)
+				color_print("minecraft:command_block:0\n  - Initialization", color=ansi_colors.DARKGRAY, allow_repeat=True)
 			sand = normal_sand("command_block")
 			if mode == 'i':
 				sand["TileEntityData"] = {
@@ -73,21 +73,21 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 
 		for command in init_commands:
 			if loud:
-				cprint(command.prettystr(), allow_repeat=True)
+				color_print(command.prettystr(), allow_repeat=True)
 			command_sands.append(generate_sand(command, 0))
 
 		for offset in repeatoffsets[::-1]:
 			blockdata = Command(format("blockdata ~ ~-{offset} ~ {auto:1b}", offset = offset), init=True)
 			if loud:
-				cprint(blockdata.prettystr(), allow_repeat=True)
+				color_print(blockdata.prettystr(), allow_repeat=True)
 			sand = generate_sand(blockdata, 0)
 			command_sands.append(sand)
 
 		if filloffset:
 			fill = Command(format("fill ~ ~-1 ~ ~ ~{offset} ~ air", offset = filloffset), init=True)
 			if loud:
-				cprint(fill.prettystr(), allow_repeat=True)
-				cprint("minecraft:barrier\n  - Initialization", color=bcolors.DARKGRAY, allow_repeat=True)
+				color_print(fill.prettystr(), allow_repeat=True)
+				color_print("minecraft:barrier\n  - Initialization", color=ansi_colors.DARKGRAY, allow_repeat=True)
 			command_sands.append(generate_sand(fill, 0))
 			command_sands.append(normal_sand("barrier"))
 
@@ -101,7 +101,7 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 					sand["TileEntityData"]["auto"] = 1
 				command_sands.append(sand)
 			if loud:
-				cprint(command.prettystr(), allow_repeat=True)
+				color_print(command.prettystr(), allow_repeat=True)
 		final_command_obj = nbt.cmd("summon FallingSand ~ ~1 ~ ", ride(command_sands, False))
 
 	final_command = nbt.JSON2Command(final_command_obj)

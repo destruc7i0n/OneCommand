@@ -1,7 +1,7 @@
 import sands
 import nbtencoder as nbt
 from classes import Command, FakeCommand
-from util import cprint, format, bcolors
+from wireutils import color_print, format, ansi_colors
 
 def ride(entities, have_id=True):
 	bottommost = entities[0]
@@ -44,14 +44,14 @@ def gen_cart_stack(init_commands, clock_commands, mode, loud=False):
 		for command in init_commands:
 			if hasattr(command, "cmd"):
 				if loud:
-					cprint(command.prettystr())
+					color_print(command.prettystr())
 				entities.append(cart(command.cmd))
 		offset = 1
 		for command in clock_commands:
 			if offset == 1:
 				command.block = "repeating_command_block"
 			if loud:
-				cprint(command.prettystr())
+				color_print(command.prettystr())
 			entities.append(cart_command_block(offset, command, 1, mode))
 			offset += 1
 
