@@ -26,7 +26,7 @@ def generate_sand(command_obj, direction):
 		},
 		"DropItem":0,
 		"Time": 1,
-		"id": nbt.noquote_str("FallingSand")
+		"id": nbt.noquote_str("falling_block")
 	}
 	data = direction+8 if command_obj.cond else direction
 	if data:
@@ -39,7 +39,7 @@ def normal_sand(block, data=0):
 		"Block": nbt.noquote_str(block),
 		"Time": 1,
 		"DropItem":0,
-		"id": nbt.noquote_str("FallingSand")
+		"id": nbt.noquote_str("falling_block")
 	}
 	if data:
 		tag["Data"] = data
@@ -102,7 +102,7 @@ def gen_stack(init_commands, clock_commands, mode, loud=False):
 				command_sands.append(sand)
 			if loud:
 				color_print(command.prettystr(), allow_repeat=True)
-		final_command_obj = nbt.cmd("summon FallingSand ~ ~1 ~ ", ride(command_sands, False))
+		final_command_obj = nbt.cmd("summon falling_block ~ ~1 ~ ", ride(command_sands, False))
 
 	final_command = nbt.JSON2Command(final_command_obj)
 
