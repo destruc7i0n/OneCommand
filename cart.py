@@ -11,7 +11,7 @@ def ride(entities, have_id=True):
 
 def cart(command):
 	return {
-		"id": nbt.noquote_str("MinecartCommandBlock"),
+		"id": nbt.noquote_str("commandblock_minecart"),
 		"Command": command
 	}
 
@@ -66,17 +66,17 @@ def gen_cart_stack(init_commands, clock_commands, mode, loud=False):
 		activatesand["TileEntityData"] = {"auto": 1}
 
 		entities.append(cart_block(offset, "air"))
-		entities.append(cart(nbt.cmd(format("summon FallingSand ~ ~{o} ~ ", o=offset), activatesand, True)))
+		entities.append(cart(nbt.cmd(format("summon falling_block ~ ~{o} ~ ", o=offset), activatesand, True)))
 
 		entities.append(cart_command_block(filloffset, Command(format("fill ~ ~ ~ ~ ~{o} ~ air", o=offset-filloffset))))
-		entities.append(cart("kill @e[r=1,type=MinecartCommandBlock]"))
+		entities.append(cart("kill @e[r=1,type=commandblock_minecart]"))
 		stack = ride(entities)
 		final_stack = sands.ride([
 			stack, 
 			sands.normal_sand("redstone_block"),
 			sands.normal_sand("barrier")
 		], False)
-		final_command_obj = nbt.cmd("summon FallingSand ~ ~1 ~ ", final_stack)
+		final_command_obj = nbt.cmd("summon falling_block ~ ~1 ~ ", final_stack)
 
 	final_command = nbt.JSON2Command(final_command_obj)
 	return final_command
